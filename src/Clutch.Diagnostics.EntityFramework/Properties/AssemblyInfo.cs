@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Clutch.Diagnostics.EntityFramework")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Diagnostics helper for EntityFramework based on EFTracingProvider")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Lukáš Novotný")]
 [assembly: AssemblyProduct("Clutch.Diagnostics.EntityFramework")]
-[assembly: AssemblyCopyright("Copyright © Algorim 2012")]
+[assembly: AssemblyCopyright("Copyright © Lukáš Novotný 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
