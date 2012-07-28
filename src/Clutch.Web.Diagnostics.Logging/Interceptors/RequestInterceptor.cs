@@ -5,6 +5,7 @@ using System.Web;
 using System.Xml.Linq;
 using Clutch.Diagnostics.Logging;
 using Microsoft.Web.Infrastructure.DynamicValidationHelper;
+using System.Reflection;
 
 namespace Clutch.Web.Diagnostics.Logging
 {
@@ -26,7 +27,7 @@ namespace Clutch.Web.Diagnostics.Logging
 		public void Prepare(ILogEvent logEvent)
 		{
 			var context = HttpContext.Current;
-			if (context == null)
+			if (context == null || IsRequestResponseHidden(context))
 				return;
 
 			var request = context.Request;
@@ -100,6 +101,17 @@ namespace Clutch.Web.Diagnostics.Logging
 		#endregion
 
 		#region Static members
+
+		static RequestInterceptor()
+		{
+			var field = typeof(HttpContext).GetField("HideRequestResponse", BindingFlags.NonPublic | BindingFlags.Instance);
+			if (field != null)
+				IsRequestResponseHidden = new Func<HttpContext, bool>(c => (bool)field.GetValue(c));
+			else
+				IsRequestResponseHidden = new Func<HttpContext, bool>(c => false);
+		}
+
+		private static readonly Func<HttpContext, bool> IsRequestResponseHidden;
 
 		public static readonly RequestInterceptor Instance = new RequestInterceptor();
 
