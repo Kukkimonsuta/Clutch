@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-	internal class DbTracingProviderFactory<T> : DbProviderFactory, IServiceProvider
+	internal abstract class DbTracingProviderFactory : DbProviderFactory
+	{ 
+	
+	}
+
+	internal class DbTracingProviderFactory<T> : DbTracingProviderFactory, IServiceProvider
 		 where T : DbProviderFactory
 	{
 		protected DbTracingProviderFactory()

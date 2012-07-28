@@ -50,6 +50,10 @@ namespace Clutch.Diagnostics.EntityFramework
 					continue;
 				}
 
+				// this provider is already wrapped
+				if (factory is DbTracingProviderFactory)
+					continue;
+
 				var profiledType = typeof(DbTracingProviderFactory<>).MakeGenericType(factory.GetType());
 				if (profiledType != null)
 				{

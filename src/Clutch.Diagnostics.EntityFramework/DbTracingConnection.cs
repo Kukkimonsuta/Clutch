@@ -19,6 +19,8 @@ namespace Clutch.Diagnostics.EntityFramework
 		{
 			if (connection == null)
 				throw new ArgumentNullException("connection");
+			if (connection is DbTracingConnection)
+				throw new InvalidOperationException("Connection is already wrapped");
 
 			this.connection = connection;
 			this.connection.StateChange += StateChangeHandler;

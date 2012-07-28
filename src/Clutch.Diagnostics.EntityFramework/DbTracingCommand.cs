@@ -14,6 +14,8 @@ namespace Clutch.Diagnostics.EntityFramework
 		{
 			if (command == null)
 				throw new ArgumentNullException("command");
+			if (command is DbTracingCommand)
+				throw new InvalidOperationException("Command is already wrapped");
 
 			this.command = command;
 			this.connection = connection;
@@ -32,6 +34,8 @@ namespace Clutch.Diagnostics.EntityFramework
 
 		#region DbCommand
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities",
+			Justification = "This is just a wrapper over DbCommand")]
 		public override string CommandText
 		{
 			get { return command.CommandText; }
