@@ -10,12 +10,6 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>Copyright 2012</copyright>
-    <tags>Clutch Logging</tags>
-    <dependencies> 
-      <group>
-        <dependency id="Clutch.Web" version="1.0" />
-        <dependency id="Clutch.Diagnostics.Logging" version="1.0" />
-      </group>
-    </dependencies>
+    <tags>Clutch</tags>
   </metadata>
 </package>

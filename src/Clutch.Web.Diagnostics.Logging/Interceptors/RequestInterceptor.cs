@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 using Clutch.Diagnostics.Logging;
+using Microsoft.Web.Infrastructure.DynamicValidationHelper;
 
 namespace Clutch.Web.Diagnostics.Logging
 {
@@ -30,12 +33,21 @@ namespace Clutch.Web.Diagnostics.Logging
 			if (request == null)
 				return;
 
-			logEvent.Set(KEY_REQUEST_ID, (context.Items["request.id"] as Guid?) ?? (Guid)(context.Items["request.id"] = Guid.NewGuid()));
-			logEvent.Set(KEY_REQUEST_IP, request.UserHostAddress); // todo: proxy handling
+			Func<NameValueCollection> formGetter;
+			Func<NameValueCollection> queryStringGetter;
+
+			ValidationUtility.GetUnvalidatedCollections(HttpContext.Current, out formGetter, out queryStringGetter);
+
+			var form = formGetter();
+
+			logEvent.Set(KEY_REQUEST_ID, request.GetRequestId());
+			logEvent.Set(KEY_REQUEST_IP, request.GetClientAddress());
 			logEvent.Set(KEY_REQUEST_URL, request.Url);
 			logEvent.Set(KEY_REQUEST_REFERRER, request.UrlReferrer);
 			logEvent.Set(KEY_REQUEST_AGENT, request.UserAgent);
-			// todo: cookies and post
+
+			logEvent.Set(KEY_REQUEST_COOKIES, string.Join("; ", request.Cookies.AllKeys.Select(k => string.Format("{0} = '{1}'", k, request.Cookies[k].Value))));
+			logEvent.Set(KEY_REQUEST_POST, string.Join("; ", form.AllKeys.Select(k => string.Format("{0} = '{1}'", k, form[k]))));
 		}
 
 		public void Render(ILogEvent logEvent, XElement message)

@@ -22,12 +22,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clutch.Web.Diagnostics.Logg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clutch.Diagnostics.Logging", "src\Clutch.Diagnostics.Logging\Clutch.Diagnostics.Logging.csproj", "{7812711F-242A-4731-B8FB-4AB48C47A555}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clutch.Web", "src\Clutch.Web\Clutch.Web.csproj", "{5D0B04A4-6178-48B4-B0D5-9E802874B6BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D0B04A4-6178-48B4-B0D5-9E802874B6BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0B04A4-6178-48B4-B0D5-9E802874B6BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0B04A4-6178-48B4-B0D5-9E802874B6BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0B04A4-6178-48B4-B0D5-9E802874B6BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7812711F-242A-4731-B8FB-4AB48C47A555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7812711F-242A-4731-B8FB-4AB48C47A555}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7812711F-242A-4731-B8FB-4AB48C47A555}.Release|Any CPU.ActiveCfg = Release|Any CPU
