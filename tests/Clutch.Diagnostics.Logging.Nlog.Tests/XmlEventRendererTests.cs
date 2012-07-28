@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 using System.IO;
+using Xunit;
 
 namespace Clutch.Diagnostics.Logging.Nlog.Tests
 {
 	public class XmlEventRendererTests
 	{
+		private static readonly global::NLog.Logger logger = global::NLog.LogManager.GetCurrentClassLogger();
+
 		[Fact]
 		public void Can_write_to_log_using_default_methods()
 		{
 			if (File.Exists("log.txt"))
 				File.Delete("log.txt");
 
-			var logger = global::NLog.LogManager.GetCurrentClassLogger();
+			for (var i = 0; i < 10; i++)
+				logger.Info("Hello {0}!", i);
 
-			logger.Info("Hello!");
-			logger.InfoException("Hello!", new Exception("Test exception"));
+			try
+			{
+				throw new Exception("Test exception");
+			}
+			catch (Exception ex)
+			{
+				logger.ErrorException("It failed :(", ex);
+			}
 
 			var test = File.ReadAllText("log.txt");
 

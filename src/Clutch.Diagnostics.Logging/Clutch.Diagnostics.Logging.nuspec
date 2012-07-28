@@ -10,11 +10,6 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>Copyright 2012</copyright>
-    <tags>Clutch NLog</tags>
-    <dependencies> 
-      <group>
-        <dependency id="Clutch.Diagnostics.Logging" version="1.0" />
-      </group>
-    </dependencies>
+    <tags>Clutch Logging</tags>
   </metadata>
 </package>

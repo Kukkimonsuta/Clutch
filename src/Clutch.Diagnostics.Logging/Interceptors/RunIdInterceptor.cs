@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Xml.Linq;
 
-namespace Clutch.Diagnostics.Logging.NLog.Interceptors
+namespace Clutch.Diagnostics.Logging.Interceptors
 {
-	public sealed class RunIdInterceptor : IXmlLogEventInterceptor
+	public sealed class RunIdInterceptor : ILogEventInterceptor
 	{
 		private const string KEY_RUN_ID = "runId";
 
@@ -14,14 +14,14 @@ namespace Clutch.Diagnostics.Logging.NLog.Interceptors
 
 		#region ILogEventInterceptor
 
-		public void Prepare(global::NLog.LogEventInfo logEvent)
+		public void Prepare(ILogEvent logEvent)
 		{
-			logEvent.Properties[KEY_RUN_ID] = RunId;
+			logEvent.Set(KEY_RUN_ID, RunId);
 		}
 
-		public void Render(global::NLog.LogEventInfo logEvent, XElement Run)
+		public void Render(ILogEvent logEvent, XElement Run)
 		{
-			Run.Add(new XAttribute("runId", logEvent.Properties[KEY_RUN_ID]));
+			Run.Add(new XAttribute("runId", logEvent.TryGet(KEY_RUN_ID, "")));
 		}
 
 		#endregion

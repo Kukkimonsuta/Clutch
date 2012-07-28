@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Clutch.Diagnostics.Logging.NLog")]
-[assembly: AssemblyDescription("Implementation of Clutch.Diagnostics.Logging using NLog")]
+[assembly: AssemblyTitle("Clutch.Web.Diagnostics.Logging")]
+[assembly: AssemblyDescription("Web logging extensions for Clutch.Diagnostics.Logging")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Lukáš Novotný")]
-[assembly: AssemblyProduct("Clutch.Diagnostics.Logging.NLog")]
+[assembly: AssemblyProduct("Clutch.Web.Diagnostics.Logging")]
 [assembly: AssemblyCopyright("Copyright © Lukáš Novotný 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9baebfd8-5c2b-4629-8724-90e77195c35f")]
+[assembly: Guid("168fe25a-6e0b-474a-bdaf-3819a1f46d78")]
 
 // Version information for an assembly consists of the following four values:
 //
