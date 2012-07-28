@@ -5,18 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Clutch.Diagnostics.EntityFramework.Tests
+namespace Clutch.Diagnostics.EntityFramework.Tests.Objects
 {
-	public class TestContext : DbContext
+	public class CodeFirstContext : DbContext
 	{
-		public TestContext()
-			: base("DefaultConnection")
+		public CodeFirstContext()
+			: base()
 		{
 			this.Configuration.AutoDetectChangesEnabled = true;
 			this.Configuration.LazyLoadingEnabled = false;
 			this.Configuration.ProxyCreationEnabled = true;
 			this.Configuration.ValidateOnSaveEnabled = true;
-
+			
 			TestEntity1 = Set<TestEntity1>();
 			TestEntity2 = Set<TestEntity2>();
 		}

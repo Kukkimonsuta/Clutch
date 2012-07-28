@@ -1,45 +1,180 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EFProviderWrapperToolkit;
+using System.ComponentModel;
+using System.Data;
 using System.Data.Common;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Remoting;
+using System.Security;
+using System.Security.Permissions;
+using System.Text;
+using System.Transactions;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-	/// <summary>
-	/// Wraps connection and holds events.
-	/// </summary>
-	public class DbTracingConnection : DbConnectionWrapper
+	public class DbTracingConnection : DbConnection, ICloneable
 	{
-		internal DbTracingConnection(DbConnection wrappedConnection)
-			: base()
+		public DbTracingConnection(DbConnection connection)
 		{
-			this.WrappedConnection = wrappedConnection;
+			if (connection == null)
+				throw new ArgumentNullException("connection");
+
+			this.connection = connection;
+			this.connection.StateChange += StateChangeHandler;
 		}
 
-		#region DbConnectionWrapper
+		private DbConnection connection;
+		private DbProviderFactory factory;
 
-		protected override string DefaultWrappedProviderName
+		public DbConnection UnderlyingConnection
 		{
-			get { return DbTracingProviderFactory.Instance.WrappedProviderName; }
+			get { return connection; }
 		}
+
+		private void StateChangeHandler(object sender, StateChangeEventArgs e)
+		{
+			OnStateChange(e);
+		}
+
+		#region DbConnection
 
 		protected override DbProviderFactory DbProviderFactory
 		{
-			get { return DbTracingProviderFactory.Instance; }
+			get
+			{
+				if (factory != null) 
+					return factory;
+
+				var tail = ripInnerProvider(connection);
+				factory = (DbProviderFactory)typeof(DbTracingProviderFactory<>).MakeGenericType(tail.GetType())
+					.GetField("Instance", BindingFlags.Public | BindingFlags.Static)
+					.GetValue(null);
+				return factory;
+			}
 		}
 
-		/// <summary>
-		/// Creates and returns a System.Data.Common.DbCommand object associated with the current connection.
-		/// </summary>
+		protected override bool CanRaiseEvents
+		{
+			get { return true; }
+		}
+
+		public override string ConnectionString
+		{
+			get { return connection.ConnectionString; }
+			set { connection.ConnectionString = value; }
+		}
+
+		public override int ConnectionTimeout
+		{
+			get { return connection.ConnectionTimeout; }
+		}
+
+		public override string Database
+		{
+			get { return connection.Database; }
+		}
+
+		public override string DataSource
+		{
+			get { return connection.DataSource; }
+		}
+
+		public override string ServerVersion
+		{
+			get { return connection.ServerVersion; }
+		}
+
+		public override ConnectionState State
+		{
+			get { return connection.State; }
+		}
+
+		public override void ChangeDatabase(string databaseName)
+		{
+			connection.ChangeDatabase(databaseName);
+		}
+
+		public override void Close()
+		{
+			connection.Close();
+		}
+
+		public override void EnlistTransaction(System.Transactions.Transaction transaction)
+		{
+			connection.EnlistTransaction(transaction);
+		}
+
+		public override DataTable GetSchema()
+		{
+			return connection.GetSchema();
+		}
+
+		public override DataTable GetSchema(string collectionName)
+		{
+			return connection.GetSchema(collectionName);
+		}
+
+		public override DataTable GetSchema(string collectionName, string[] restrictionValues)
+		{
+			return connection.GetSchema(collectionName, restrictionValues);
+		}
+
+		public override void Open()
+		{
+			connection.Open();
+		}
+
+		protected override DbTransaction BeginDbTransaction(System.Data.IsolationLevel isolationLevel)
+		{
+			return connection.BeginTransaction(isolationLevel);
+		}
+
 		protected override DbCommand CreateDbCommand()
 		{
-			var command = WrappedConnection.CreateCommand();
-
-			return new DbTracingCommand(command) { Connection = this };
+			return new DbTracingCommand(connection.CreateCommand(), this);
 		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && connection != null)
+			{
+				connection.StateChange -= StateChangeHandler;
+				connection.Dispose();
+			}
+
+			connection = null;
+
+			base.Dispose(disposing);
+		}
+
+		#endregion
+
+		#region ICloneable
+
+		public DbTracingConnection Clone()
+		{
+			var tail = connection as ICloneable;
+
+			if (tail == null) 
+				throw new NotSupportedException("Underlying " + connection.GetType().Name + " is not cloneable");
+
+			return new DbTracingConnection((DbConnection)tail.Clone());
+		}
+
+		object ICloneable.Clone()
+		{
+			return Clone();
+		}
+
+		#endregion
+
+		#region Static members
+
+		private static readonly Func<DbConnection, DbProviderFactory> ripInnerProvider = (Func<DbConnection, DbProviderFactory>)Delegate.CreateDelegate(
+			typeof(Func<DbConnection, DbProviderFactory>),
+			typeof(DbConnection).GetProperty("DbProviderFactory", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).GetGetMethod(true)
+		);
 
 		#endregion
 	}

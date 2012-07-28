@@ -9,6 +9,7 @@ using Moq;
 using Moq.Protected;
 using System.Data.Common;
 using System.Data.SqlClient;
+using Clutch.Diagnostics.EntityFramework.Tests.Objects;
 
 namespace Clutch.Diagnostics.EntityFramework.Tests
 {
@@ -58,7 +59,7 @@ namespace Clutch.Diagnostics.EntityFramework.Tests
 			DbTracing.AddListener(mock.Object);
 			try
 			{
-				using (var context = new TestContext())
+				using (var context = new CodeFirstContext())
 				{
 					context.TestEntity1.Add(new TestEntity1());
 					context.TestEntity2.Add(new TestEntity2());
@@ -84,7 +85,7 @@ namespace Clutch.Diagnostics.EntityFramework.Tests
 			DbTracing.AddListener(mock.Object);
 			try
 			{
-				using (var context = new TestContext())
+				using (var context = new CodeFirstContext())
 				{
 					context.Database.ExecuteSqlCommand("select 1; select @date", new SqlParameter("date", DateTime.Now));
 

@@ -1,61 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.Common.CommandTrees;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using EFProviderWrapperToolkit;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-	/// <summary>
-	/// Implementation of <see cref="DbProviderServices"/> for EFTracingProvider.
-	/// </summary>
-	internal class DbTracingProviderServices : DbProviderServicesBase
+	public class DbTracingProviderServices : DbProviderServices
 	{
-		private DbTracingProviderServices()
-		{ }
-
-		#region DbProviderServicesBase
-
-		/// <summary>
-		/// Gets the default name of the wrapped provider.
-		/// </summary>
-		protected override string DefaultWrappedProviderName
+		public DbTracingProviderServices(DbProviderServices providerServices)
 		{
-			get { return DbTracingProviderFactory.Instance.WrappedProviderName; }
+			this.providerServices = providerServices;
 		}
 
-		/// <summary>
-		/// Gets the provider invariant iname.
-		/// </summary>
-		protected override string ProviderInvariantName
+		private DbProviderServices providerServices;
+
+		private static DbConnection GetRealConnection(DbConnection connection)
 		{
-			get { return DbTracingProviderFactory.InvariantProviderName; }
+			var tracingConnection = connection as DbTracingConnection;
+
+			if (tracingConnection != null)
+				return tracingConnection.UnderlyingConnection;
+
+			return connection;
 		}
 
-		/// <summary>
-		/// Creates the command definition wrapper.
-		/// </summary>
-		public override DbCommandDefinitionWrapper CreateCommandDefinitionWrapper(DbCommandDefinition wrappedCommandDefinition, DbCommandTree commandTree)
+		#region DbProviderServices
+
+		protected override DbProviderManifest GetDbProviderManifest(string manifestToken)
 		{
-			return new DbCommandDefinitionWrapper(wrappedCommandDefinition, commandTree, (cmd, def) => new DbTracingCommand(cmd, def));
+			return providerServices.GetProviderManifest(manifestToken);
 		}
 
-		#endregion
-
-		#region Static members
-
-		static DbTracingProviderServices()
+		protected override string GetDbProviderManifestToken(DbConnection connection)
 		{
-			Instance = new DbTracingProviderServices();
+			return providerServices.GetProviderManifestToken(GetRealConnection(connection));
 		}
 
-		/// <summary>
-		/// Gets the singleton instance.
-		/// </summary>
-		public static DbTracingProviderServices Instance { get; private set; }
+		protected override DbCommandDefinition CreateDbCommandDefinition(DbProviderManifest providerManifest, System.Data.Common.CommandTrees.DbCommandTree commandTree)
+		{
+			var cmdDef = providerServices.CreateCommandDefinition(providerManifest, commandTree);
+			var cmd = cmdDef.CreateCommand();
+			return CreateCommandDefinition(new DbTracingCommand(cmd, cmd.Connection));
+		}
+
+		protected override void DbCreateDatabase(DbConnection connection, int? commandTimeout, System.Data.Metadata.Edm.StoreItemCollection storeItemCollection)
+		{
+			providerServices.CreateDatabase(GetRealConnection(connection), commandTimeout, storeItemCollection);
+		}
+
+		protected override void DbDeleteDatabase(DbConnection connection, int? commandTimeout, System.Data.Metadata.Edm.StoreItemCollection storeItemCollection)
+		{
+			providerServices.DeleteDatabase(GetRealConnection(connection), commandTimeout, storeItemCollection);
+		}
+
+		protected override string DbCreateDatabaseScript(string providerManifestToken, System.Data.Metadata.Edm.StoreItemCollection storeItemCollection)
+		{
+			return providerServices.CreateDatabaseScript(providerManifestToken, storeItemCollection);
+		}
+
+		protected override bool DbDatabaseExists(DbConnection connection, int? commandTimeout, System.Data.Metadata.Edm.StoreItemCollection storeItemCollection)
+		{
+			return providerServices.DatabaseExists(GetRealConnection(connection), commandTimeout, storeItemCollection);
+		}
+
+		public override DbCommandDefinition CreateCommandDefinition(DbCommand prototype)
+		{
+			return providerServices.CreateCommandDefinition(prototype);
+		}
 
 		#endregion
 	}

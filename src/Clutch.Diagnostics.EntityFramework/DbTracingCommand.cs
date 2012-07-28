@@ -5,83 +5,95 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using EFProviderWrapperToolkit;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-	/// <summary>
-	/// Wraps command and fires connection events.
-	/// </summary>
-	public class DbTracingCommand : DbCommandWrapper
+	public class DbTracingCommand : DbCommand, ICloneable
 	{
-		internal DbTracingCommand(DbCommand command)
-			: this(command, null)
-		{ }
-		internal DbTracingCommand(DbCommand command, DbCommandDefinitionWrapper definition)
-			: base(command, definition)
+		public DbTracingCommand(DbCommand command, DbConnection connection)
 		{
-			this.Id = Guid.NewGuid();
+			if (command == null)
+				throw new ArgumentNullException("command");
+
+			this.command = command;
+			this.connection = connection;
 		}
 
-		/// <summary>
-		/// Returns unique id of the command.
-		/// </summary>
-		public Guid Id { get; protected set; }
+		private DbCommand command;
+		private DbConnection connection;
 
-		#region DbCommandWrapper
-
-		/// <summary>
-		/// Executes the query and returns the first column of the first row in the result set returned by the query. All other columns and rows are ignored.
-		/// </summary>
-		public override object ExecuteScalar()
+		public DbCommand UnderlyingCommand
 		{
-			var sw = new Stopwatch();
-
-			DbTracing.FireCommandExecuting(Connection, this);
-			try
+			get
 			{
-				sw.Start();
-				var result = base.ExecuteScalar();
-				sw.Stop();
-				DbTracing.FireCommandFinished(Connection, this, result, sw.Elapsed);
-				return result;
-			}
-			catch (Exception ex)
-			{
-				sw.Stop();
-
-				DbTracing.FireCommandFailed(Connection, this, ex, sw.Elapsed);
-				throw;
+				return command;
 			}
 		}
 
-		/// <summary>
-		/// Executes a SQL statement against a connection object.
-		/// </summary>
-		public override int ExecuteNonQuery()
-		{
-			var sw = new Stopwatch();
+		#region DbCommand
 
-			DbTracing.FireCommandExecuting(Connection, this);
-			try
+		public override string CommandText
+		{
+			get { return command.CommandText; }
+			set { command.CommandText = value; }
+		}
+
+		public override int CommandTimeout
+		{
+			get { return command.CommandTimeout; }
+			set { command.CommandTimeout = value; }
+		}
+
+		public override CommandType CommandType
+		{
+			get { return command.CommandType; }
+			set { command.CommandType = value; }
+		}
+
+		protected override DbConnection DbConnection
+		{
+			get
 			{
-				sw.Start();
-				var result = base.ExecuteNonQuery();
-				sw.Stop();
-				DbTracing.FireCommandFinished(Connection, this, result, sw.Elapsed);
-				return result;
+				return connection;
 			}
-			catch (Exception ex)
+			set
 			{
-				DbTracing.FireCommandFailed(Connection, this, ex, sw.Elapsed);
-				throw;
+				connection = value;
+
+				var tracingConnection = value as DbTracingConnection;
+				if (tracingConnection != null)
+					command.Connection = tracingConnection.UnderlyingConnection;
+				else
+					command.Connection = value;
 			}
 		}
 
-		/// <summary>
-		/// Executes the command text against the connection.
-		/// </summary>
+		protected override DbParameterCollection DbParameterCollection
+		{
+			get
+			{
+				return command.Parameters;
+			}
+		}
+
+		protected override DbTransaction DbTransaction
+		{
+			get { return command.Transaction; }
+			set { command.Transaction = value; }
+		}
+
+		public override bool DesignTimeVisible
+		{
+			get { return command.DesignTimeVisible; }
+			set { command.DesignTimeVisible = value; }
+		}
+
+		public override UpdateRowSource UpdatedRowSource
+		{
+			get { return command.UpdatedRowSource; }
+			set { command.UpdatedRowSource = value; }
+		}
+
 		protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
 		{
 			var sw = new Stopwatch();
@@ -90,9 +102,11 @@ namespace Clutch.Diagnostics.EntityFramework
 			try
 			{
 				sw.Start();
-				var result = base.ExecuteDbDataReader(behavior);
+				var result = command.ExecuteReader(behavior);
 				sw.Stop();
+
 				DbTracing.FireCommandFinished(Connection, this, result, sw.Elapsed);
+
 				return result;
 			}
 			catch (Exception ex)
@@ -102,6 +116,97 @@ namespace Clutch.Diagnostics.EntityFramework
 				DbTracing.FireCommandFailed(Connection, this, ex, sw.Elapsed);
 				throw;
 			}
+		}
+
+		public override int ExecuteNonQuery()
+		{
+			var sw = new Stopwatch();
+
+			DbTracing.FireCommandExecuting(Connection, this);
+			try
+			{
+				sw.Start();
+				var result = command.ExecuteNonQuery();
+				sw.Stop();
+
+				DbTracing.FireCommandFinished(Connection, this, result, sw.Elapsed);
+
+				return result;
+			}
+			catch (Exception ex)
+			{
+				DbTracing.FireCommandFailed(Connection, this, ex, sw.Elapsed);
+				throw;
+			}
+		}
+
+		public override object ExecuteScalar()
+		{
+			var sw = new Stopwatch();
+
+			DbTracing.FireCommandExecuting(Connection, this);
+			try
+			{
+				sw.Start();
+				var result = command.ExecuteScalar();
+				sw.Stop();
+
+				DbTracing.FireCommandFinished(Connection, this, result, sw.Elapsed);
+
+				return result;
+			}
+			catch (Exception ex)
+			{
+				sw.Stop();
+
+				DbTracing.FireCommandFailed(Connection, this, ex, sw.Elapsed);
+				throw;
+			}
+		}
+
+		public override void Cancel()
+		{
+			command.Cancel();
+		}
+
+		public override void Prepare()
+		{
+			command.Prepare();
+		}
+
+		protected override DbParameter CreateDbParameter()
+		{
+			return command.CreateParameter();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && command != null)
+			{
+				command.Dispose();
+			}
+
+			command = null;
+			base.Dispose(disposing);
+		}
+
+		#endregion
+
+		#region ICloneable
+
+		public DbTracingCommand Clone()
+		{
+			ICloneable tail = command as ICloneable;
+
+			if (tail == null)
+				throw new NotSupportedException("Underlying " + command.GetType().Name + " is not cloneable");
+
+			return new DbTracingCommand((DbCommand)tail.Clone(), connection);
+		}
+
+		object ICloneable.Clone()
+		{
+			return Clone();
 		}
 
 		#endregion

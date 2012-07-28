@@ -6,8 +6,11 @@ using System.Data.EntityClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EFProviderWrapperToolkit;
 using System.Threading;
+using System.Configuration;
+using System.Data;
+using System.Reflection;
+using System.Data.Entity;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
@@ -19,9 +22,46 @@ namespace Clutch.Diagnostics.EntityFramework
 		/// <summary>
 		/// Intializes tracing
 		/// </summary>
-		public static void Initialize(string wrappedProviderName = "System.Data.SqlClient")
+		public static void Initialize()
 		{
-			DbTracingProviderFactory.SetWrappedProviderName(wrappedProviderName);
+			DbProviderFactories.GetFactoryClasses();
+
+			Type type = typeof(DbProviderFactories);
+
+			DataTable table;
+			object setOrTable = (type.GetField("_configTable", BindingFlags.NonPublic | BindingFlags.Static) ??
+							type.GetField("_providerTable", BindingFlags.NonPublic | BindingFlags.Static)).GetValue(null);
+			if (setOrTable is DataSet)
+			{
+				table = ((DataSet)setOrTable).Tables["DbProviderFactories"];
+			}
+
+			table = (DataTable)setOrTable;
+
+			foreach (var row in table.Rows.Cast<DataRow>().ToList())
+			{
+				DbProviderFactory factory;
+				try
+				{
+					factory = DbProviderFactories.GetFactory(row);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				var profiledType = typeof(DbTracingProviderFactory<>).MakeGenericType(factory.GetType());
+				if (profiledType != null)
+				{
+					var profiled = table.NewRow();
+					profiled["Name"] = row["Name"];
+					profiled["Description"] = row["Description"];
+					profiled["InvariantName"] = row["InvariantName"];
+					profiled["AssemblyQualifiedName"] = profiledType.AssemblyQualifiedName;
+					table.Rows.Remove(row);
+					table.Rows.Add(profiled);
+				}
+			}
 		}
 
 		private static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
@@ -64,7 +104,7 @@ namespace Clutch.Diagnostics.EntityFramework
 			enabled = true;
 		}
 
-		internal static void FireCommandExecuting(DbConnection connection, DbTracingCommand command)
+		internal static void FireCommandExecuting(DbConnection connection, DbCommand command)
 		{
 			if (!enabled)
 				return;
@@ -81,7 +121,7 @@ namespace Clutch.Diagnostics.EntityFramework
 			}
 		}
 
-		internal static void FireCommandFinished(DbConnection connection, DbTracingCommand command, object result, TimeSpan duration)
+		internal static void FireCommandFinished(DbConnection connection, DbCommand command, object result, TimeSpan duration)
 		{
 			if (!enabled)
 				return;
@@ -100,7 +140,7 @@ namespace Clutch.Diagnostics.EntityFramework
 			FireCommandExecuted(connection, command, result, duration);
 		}
 
-		internal static void FireCommandFailed(DbConnection connection, DbTracingCommand command, Exception ex, TimeSpan duration)
+		internal static void FireCommandFailed(DbConnection connection, DbCommand command, Exception ex, TimeSpan duration)
 		{
 			if (!enabled)
 				return;
@@ -119,7 +159,7 @@ namespace Clutch.Diagnostics.EntityFramework
 			FireCommandExecuted(connection, command, ex, duration);
 		}
 
-		private static void FireCommandExecuted(DbConnection connection, DbTracingCommand command, object result, TimeSpan duration)
+		private static void FireCommandExecuted(DbConnection connection, DbCommand command, object result, TimeSpan duration)
 		{
 			if (!enabled)
 				return;
