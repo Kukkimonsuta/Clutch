@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Clutch.Diagnostics.EntityFramework")]
-[assembly: AssemblyDescription("Diagnostics helper for EntityFramework based on EFTracingProvider")]
+[assembly: AssemblyDescription("Diagnostics helper for EntityFramework based on MiniProfiler")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Lukáš Novotný")]
 [assembly: AssemblyProduct("Clutch.Diagnostics.EntityFramework")]
