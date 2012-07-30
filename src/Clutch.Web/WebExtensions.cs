@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Net;
 
 namespace Clutch.Web
 {
@@ -25,17 +26,22 @@ namespace Clutch.Web
 		public static string GetClientAddress(this HttpRequestBase request)
 		{
 			// Check for proxy/loadbalancer
-			var address = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-			if (!string.IsNullOrWhiteSpace(address))
+			var httpForwardedFor = request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+			if (!string.IsNullOrWhiteSpace(httpForwardedFor))
 			{
 				// HTTP_X_FORWARDED_FOR can contain multiple addresses, the first should be client ip
-				var addresses = address.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+				var addresses = httpForwardedFor.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-				if (address.Length > 0)
+				if (addresses.Length > 0)
 				{
-					address = addresses.First();
-
-					return address;
+					// find first valid ip address (there should be no invalid adresses, but just to be sure..)
+					foreach (var ipString in addresses.Select(a => a.Trim()))
+					{
+						// make sure this is valid ip address
+						IPAddress address;
+						if (IPAddress.TryParse(ipString, out address))
+							return ipString;
+					}
 				}
 			}
 
