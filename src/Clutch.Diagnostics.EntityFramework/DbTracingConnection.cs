@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting;
-using System.Security;
-using System.Security.Permissions;
-using System.Text;
-using System.Transactions;
 
 namespace Clutch.Diagnostics.EntityFramework
 {

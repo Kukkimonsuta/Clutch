@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Data.Common;
-using System.Data.EntityClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Configuration;
 using System.Data;
+using System.Data.Common;
+using System.Linq;
 using System.Reflection;
-using System.Data.Entity;
+using System.Threading;
 
 namespace Clutch.Diagnostics.EntityFramework
 {

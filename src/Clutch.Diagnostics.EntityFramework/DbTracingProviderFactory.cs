@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
