@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://opensource.org/licenses/MS-PL</licenseUrl>
+    <projectUrl>https://github.com/Kukkimonsuta/Clutch</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright 2012</copyright>
+    <tags>Clutch Mvc</tags>
+    <dependencies> 
+      <group>
+        <dependency id="Clutch" version="1.0" />
+        <dependency id="Clutch.Web" version="1.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
