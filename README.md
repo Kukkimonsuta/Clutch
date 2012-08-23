@@ -1,5 +1,42 @@
 # Clutch
 
+## Clutch.Diagnostics.EntityFramework
+
+Provides api for tracing EntityFramework sql commands.
+
+Example listener:
+
+```c#
+public class NLogDbTracingListener : IDbTracingListener
+{
+  private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
+  void IDbTracingListener.CommandExecuted(DbConnection connection, DbCommand command, object result, TimeSpan duration)
+  { }
+  
+  void IDbTracingListener.CommandExecuting(DbConnection connection, DbCommand command)
+  { }
+  
+  void IDbTracingListener.CommandFailed(DbConnection connection, DbCommand command, Exception exception, TimeSpan duration)
+  { }
+  
+  void IDbTracingListener.CommandFinished(DbConnection connection, DbCommand command, object result, TimeSpan duration)
+  {
+    logger.Trace("-- time: {0}{1}{2}", duration, Environment.NewLine, command.ToTraceString());
+  }
+}
+```
+
+Example configuration for web project:
+
+```c#
+protected void Application_Start()
+{
+    DbTracing.Initialize();
+    DbTracing.AddListener(new NLogDbTracingListener());
+}
+```
+
 ## Clutch.Diagnostics.Logging.NLog
 
 Extends log messages of NLog with Clutch.Diagnostics.Logging and writes to log file using xml.
@@ -20,7 +57,7 @@ Example NLog configuration:
     <target xsi:type="File" name="file" encoding="UTF-8" fileName="${basedir}/App_Data/logs/log.txt" archiveNumbering="Rolling"
             maxArchiveFiles="28" archiveEvery="Day" archiveFileName="${basedir}/App_Data/logs/log_{##}.txt"
             createDirs="true" autoFlush="true">
-      <layout xsi:type="Xml" />
+      <layout xsi:type="ClutchXml" />
     </target>
 
     <target name="debugger" xsi:type="Debugger"

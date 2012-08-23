@@ -12,7 +12,7 @@ using System.Diagnostics;
 
 namespace Clutch.Diagnostics.Logging.NLog
 {
-	[Layout("Xml")]
+	[Layout("ClutchXml")]
 	public class XmlLayout : Layout
 	{
 		private const string EVENT_PREPARED = "97A9736A-D767-4C9C-A28A-5A2E522E332D";
