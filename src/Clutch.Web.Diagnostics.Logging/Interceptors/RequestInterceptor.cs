@@ -7,7 +7,7 @@ using Clutch.Diagnostics.Logging;
 using Microsoft.Web.Infrastructure.DynamicValidationHelper;
 using System.Reflection;
 
-namespace Clutch.Web.Diagnostics.Logging
+namespace Clutch.Web.Diagnostics.Logging.Interceptors
 {
 	public class RequestInterceptor : ILogEventInterceptor
 	{
