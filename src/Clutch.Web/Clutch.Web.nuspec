@@ -11,5 +11,10 @@
     <description>$description$</description>
     <copyright>Copyright 2012</copyright>
     <tags>Clutch</tags>
+    <dependencies> 
+      <group>
+        <dependency id="Clutch" version="1.0" />
+      </group>
+    </dependencies>
   </metadata>
 </package>

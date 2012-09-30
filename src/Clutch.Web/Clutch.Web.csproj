@@ -42,8 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HtmlAttributeDictionary.cs" />
+    <Compile Include="Runtime\HttpContextScopeStrategy.cs" />
     <Compile Include="WebExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Clutch\Clutch.csproj">
+      <Project>{3f26d642-36a8-4d91-a1da-d2ce07498e49}</Project>
+      <Name>Clutch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

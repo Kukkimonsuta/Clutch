@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E75ECBA4-CE28-40D1-9D2A-9E0890B9182D}</ProjectGuid>
+    <ProjectGuid>{F16BBBC2-631E-412A-BEAF-078E97384F94}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Clutch.Diagnostics.EntityFramework.Tests</RootNamespace>
-    <AssemblyName>Clutch.Diagnostics.EntityFramework.Tests</AssemblyName>
+    <RootNamespace>Clutch.Diagnostics.Tests</RootNamespace>
+    <AssemblyName>Clutch.Diagnostics.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -33,17 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
-    </Reference>
     <Reference Include="Moq">
       <HintPath>..\..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,21 +48,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbTracingTests.cs" />
+    <Compile Include="DiagnosticsContextTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Objects\CodeFirstContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Clutch.Diagnostics.EntityFramework\Clutch.Diagnostics.EntityFramework.csproj">
-      <Project>{c9d5fd53-ccf7-478f-bc42-40414a63205a}</Project>
-      <Name>Clutch.Diagnostics.EntityFramework</Name>
+    <ProjectReference Include="..\..\src\Clutch.Diagnostics\Clutch.Diagnostics.csproj">
+      <Project>{172c1792-2513-4b7b-a398-ed95834ef3d1}</Project>
+      <Name>Clutch.Diagnostics</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
