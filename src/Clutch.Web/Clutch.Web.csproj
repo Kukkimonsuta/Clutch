@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HtmlAttributeDictionary.cs" />
+    <Compile Include="Ref.cs" />
+    <Compile Include="WebBootstrap.cs" />
     <Compile Include="Runtime\HttpContextScopeStrategy.cs" />
     <Compile Include="WebExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

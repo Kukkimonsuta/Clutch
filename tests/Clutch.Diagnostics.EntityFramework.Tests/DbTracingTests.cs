@@ -10,11 +10,17 @@ using Moq.Protected;
 using System.Data.Common;
 using System.Data.SqlClient;
 using Clutch.Diagnostics.EntityFramework.Tests.Objects;
+using Clutch.Runtime;
 
 namespace Clutch.Diagnostics.EntityFramework.Tests
 {
 	public class DbTracingTests
 	{
+		static DbTracingTests()
+		{
+			Bootstrap.Startup();
+		}
+
 		private Mock<IDbTracingListener> MockListener()
 		{
 			var mock = new Mock<IDbTracingListener>();
@@ -52,8 +58,6 @@ namespace Clutch.Diagnostics.EntityFramework.Tests
 		[Fact]
 		public void Can_catch_entity_framework_command()
 		{
-			DbTracing.Initialize();
-
 			var mock = MockListener();
 
 			DbTracing.AddListener(mock.Object);
@@ -78,8 +82,6 @@ namespace Clutch.Diagnostics.EntityFramework.Tests
 		[Fact]
 		public void Can_catch_execute_sql_command()
 		{
-			DbTracing.Initialize();
-
 			var mock = MockListener();
 
 			DbTracing.AddListener(mock.Object);

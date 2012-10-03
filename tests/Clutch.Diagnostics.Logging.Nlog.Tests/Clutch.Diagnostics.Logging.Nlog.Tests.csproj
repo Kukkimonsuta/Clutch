@@ -65,6 +65,10 @@
       <Project>{e616ebfd-1b12-459d-a4b7-d45e349fba25}</Project>
       <Name>Clutch.Diagnostics.Logging.NLog</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Clutch\Clutch.csproj">
+      <Project>{3f26d642-36a8-4d91-a1da-d2ce07498e49}</Project>
+      <Name>Clutch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

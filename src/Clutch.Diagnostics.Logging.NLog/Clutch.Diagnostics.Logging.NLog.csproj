@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LogEventWrapper.cs" />
+    <Compile Include="Ref.cs" />
     <Compile Include="XmlLayout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -16,51 +16,9 @@ namespace Clutch.Diagnostics.EntityFramework
 		/// <summary>
 		/// Intializes tracing
 		/// </summary>
+		[Obsolete("This method is now invoked by Clutch.Bootstrap.Startup call, will be non-public in near future")]
 		public static void Initialize()
-		{
-			DbProviderFactories.GetFactoryClasses();
-
-			Type type = typeof(DbProviderFactories);
-
-			DataTable table;
-			object setOrTable = (type.GetField("_configTable", BindingFlags.NonPublic | BindingFlags.Static) ??
-							type.GetField("_providerTable", BindingFlags.NonPublic | BindingFlags.Static)).GetValue(null);
-			if (setOrTable is DataSet)
-			{
-				table = ((DataSet)setOrTable).Tables["DbProviderFactories"];
-			}
-
-			table = (DataTable)setOrTable;
-
-			foreach (var row in table.Rows.Cast<DataRow>().ToList())
-			{
-				DbProviderFactory factory;
-				try
-				{
-					factory = DbProviderFactories.GetFactory(row);
-				}
-				catch (Exception)
-				{
-					continue;
-				}
-
-				// this provider is already wrapped
-				if (factory is DbTracingProviderFactory)
-					continue;
-
-				var profiledType = typeof(DbTracingProviderFactory<>).MakeGenericType(factory.GetType());
-				if (profiledType != null)
-				{
-					var profiled = table.NewRow();
-					profiled["Name"] = row["Name"];
-					profiled["Description"] = row["Description"];
-					profiled["InvariantName"] = row["InvariantName"];
-					profiled["AssemblyQualifiedName"] = profiledType.AssemblyQualifiedName;
-					table.Rows.Remove(row);
-					table.Rows.Add(profiled);
-				}
-			}
-		}
+		{ }
 
 		private static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 		private static IList<IDbTracingListener> listeners = new List<IDbTracingListener>();

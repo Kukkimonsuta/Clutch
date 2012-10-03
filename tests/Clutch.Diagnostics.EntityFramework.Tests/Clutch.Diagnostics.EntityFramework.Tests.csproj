@@ -67,6 +67,10 @@
       <Project>{c9d5fd53-ccf7-478f-bc42-40414a63205a}</Project>
       <Name>Clutch.Diagnostics.EntityFramework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Clutch\Clutch.csproj">
+      <Project>{3f26d642-36a8-4d91-a1da-d2ce07498e49}</Project>
+      <Name>Clutch</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

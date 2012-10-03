@@ -57,7 +57,6 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 			if (requestElement == null)
 			{
 				requestElement = new XElement("request");
-				message.Add(requestElement);
 			}
 			requestElement.SetAttributeValue("id", logEvent.TryGet(KEY_REQUEST_ID, null));
 			requestElement.SetAttributeValue("ip", logEvent.TryGet(KEY_REQUEST_IP, null));
@@ -95,6 +94,11 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 					requestElement.Add(postElement);
 				}
 				postElement.SetValue(logEvent.Get(KEY_REQUEST_POST));
+			}
+
+			if (requestElement.Parent == null && (!requestElement.IsEmpty || requestElement.Attributes().Any()))
+			{
+				message.Add(requestElement);
 			}
 		}
 

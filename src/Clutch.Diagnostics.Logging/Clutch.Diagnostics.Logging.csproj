@@ -50,6 +50,7 @@
     <Compile Include="LogEventInterceptorProviderCollection.cs" />
     <Compile Include="LogEventInterceptorProviders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ref.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

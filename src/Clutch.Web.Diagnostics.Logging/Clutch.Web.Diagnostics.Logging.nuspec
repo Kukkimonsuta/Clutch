@@ -13,6 +13,7 @@
     <tags>Clutch Logging</tags>
     <dependencies> 
       <group>
+				<dependency id="Clutch" version="1.0" />
         <dependency id="Clutch.Web" version="1.0" />
         <dependency id="Clutch.Diagnostics.Logging" version="1.0" />
       </group>
