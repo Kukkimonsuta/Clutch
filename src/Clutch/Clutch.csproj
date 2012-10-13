@@ -40,6 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\CollectionPage.cs" />
+    <Compile Include="Data\PagingExtensions.cs" />
+    <Compile Include="Data\PagingOptions.cs" />
+    <Compile Include="Data\SortExtensions.cs" />
+    <Compile Include="Data\SortOptions.cs" />
     <Compile Include="Runtime\Bootstrap.cs" />
     <Compile Include="Runtime\BootstrapSubscriber.cs" />
     <Compile Include="Runtime\ExecutionScope.cs" />
