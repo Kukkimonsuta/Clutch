@@ -11,7 +11,7 @@ namespace Clutch.Data
 	/// </summary>
 	public sealed class PagingOptions<TEntity>
 	{
-		private PagingOptions(int pageIndex, int pageSize, SortOptions<TEntity> sortOptions, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
+		private PagingOptions(int pageIndex, int pageSize, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
 		{
 			if (pageIndex < 0)
 				throw new ArgumentOutOfRangeException("pageIndex", "PageIndex must be more or equal to zero");
@@ -24,7 +24,6 @@ namespace Clutch.Data
 
 			PageIndex = pageIndex;
 			PageSize = pageSize;
-			SortOptions = sortOptions;
 			TotalNeeded = totalNeeded;
 			Offset = offset;
 			MaxPageCount = maxPageCount;
@@ -57,7 +56,6 @@ namespace Clutch.Data
 				pageSize = value;
 			}
 		}
-		public SortOptions<TEntity> SortOptions { get; set; }
 		public bool TotalNeeded { get; set; }
 		public int Offset
 		{
@@ -85,9 +83,6 @@ namespace Clutch.Data
 		internal CollectionPage<TEntity> Execute(IQueryable<TEntity> query)
 		{
 			var result = query;
-
-			if (this.SortOptions != null)
-				result = this.SortOptions.Execute(result);
 
 			var actualOffset = Math.Max(0, this.Offset - this.PageIndex * this.PageSize);
 
@@ -121,9 +116,6 @@ namespace Clutch.Data
 		{
 			var result = resource;
 
-			if (this.SortOptions != null)
-				result = this.SortOptions.Execute(result);
-
 			var actualOffset = Math.Max(0, this.Offset - this.PageIndex * this.PageSize);
 
 			var toSkip = this.PageIndex * this.PageSize - this.Offset;
@@ -155,14 +147,9 @@ namespace Clutch.Data
 
 		#region Static members
 
-		public static PagingOptions<TEntity> Create(int pageIndex, int pageSize, SortOptions<TEntity> sortOptions, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
+		public static PagingOptions<TEntity> Create(int pageIndex, int pageSize, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
 		{
-			return new PagingOptions<TEntity>(pageIndex, pageSize, sortOptions, totalNeeded, offset);
-		}
-
-		public static PagingOptions<TEntity> Create<TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> expression, bool descending = false, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
-		{
-			return PagingOptions<TEntity>.Create(pageIndex, pageSize, SortOptions<TEntity>.Create(expression, descending: descending), totalNeeded: totalNeeded, offset: offset);
+			return new PagingOptions<TEntity>(pageIndex, pageSize, totalNeeded, offset);
 		}
 
 		#endregion

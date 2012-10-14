@@ -11,7 +11,7 @@ namespace Clutch.Data
 	/// </summary>
 	public abstract class CollectionPage
 	{
-		internal CollectionPage(int pageIndex, int pageSize, int totalSize, int offset, int? maxPageCount)
+		public CollectionPage(int pageIndex, int pageSize, int totalSize, int offset, int? maxPageCount)
 		{
 			PageIndex = pageIndex;
 			PageSize = pageSize;
@@ -66,7 +66,7 @@ namespace Clutch.Data
 	/// </summary>
 	public class CollectionPage<T> : CollectionPage, IEnumerable<T>
 	{
-		internal CollectionPage(IEnumerable<T> data, int pageIndex, int pageSize, int totalSize, int offset, int? maxPageCount)
+		public CollectionPage(IEnumerable<T> data, int pageIndex, int pageSize, int totalSize, int offset, int? maxPageCount)
 			: base(pageIndex, pageSize, totalSize, offset, maxPageCount)
 		{
 			this.data = data;
