@@ -9,7 +9,7 @@ namespace Clutch.Data
 	/// <summary>
 	/// Holds information about requested paging
 	/// </summary>
-	public sealed class PagingOptions<TEntity>
+	public sealed class PagingOptions
 	{
 		private PagingOptions(int pageIndex, int pageSize, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
 		{
@@ -80,23 +80,30 @@ namespace Clutch.Data
 			}
 		}
 
-		internal CollectionPage<TEntity> Execute(IQueryable<TEntity> query)
+		public int ToSkip
+		{
+			get { return this.PageIndex * this.PageSize - this.Offset; }
+		}
+
+		public int OffsetOnPage
+		{
+			get { return Math.Max(0, this.Offset - this.PageIndex * this.PageSize); }
+		}
+
+		internal CollectionPage<TEntity> Execute<TEntity>(IQueryable<TEntity> query)
 		{
 			var result = query;
 
-			var actualOffset = Math.Max(0, this.Offset - this.PageIndex * this.PageSize);
+			if (this.ToSkip > 0)
+				result = result.Skip(this.ToSkip);
 
-			var toSkip = this.PageIndex * this.PageSize - this.Offset;
-			if (toSkip > 0)
-				result = result.Skip(toSkip);
-
-			var data = actualOffset >= this.PageSize ? new TEntity[0] : result.Take(this.PageSize - actualOffset).ToArray();
+			var data = this.OffsetOnPage >= this.PageSize ? new TEntity[0] : result.Take(this.PageSize - this.OffsetOnPage).ToArray();
 
 			var total = -1;
 			if (this.TotalNeeded)
 			{
-				if (this.PageIndex == 0 && data.Length + actualOffset < this.PageSize)
-					total = data.Length + actualOffset;
+				if (this.PageIndex == 0 && data.Length + this.OffsetOnPage < this.PageSize)
+					total = data.Length + this.OffsetOnPage;
 				else if (this.MaxPageCount != null)
 					total = (query.Take(this.MaxPageCount.Value * this.PageSize - this.Offset)).Count();
 				else
@@ -112,23 +119,20 @@ namespace Clutch.Data
 				this.MaxPageCount
 			);
 		}
-		internal CollectionPage<TEntity> Execute(IEnumerable<TEntity> resource)
+		internal CollectionPage<TEntity> Execute<TEntity>(IEnumerable<TEntity> resource)
 		{
 			var result = resource;
 
-			var actualOffset = Math.Max(0, this.Offset - this.PageIndex * this.PageSize);
+			if (ToSkip > 0)
+				result = result.Skip(ToSkip);
 
-			var toSkip = this.PageIndex * this.PageSize - this.Offset;
-			if (toSkip > 0)
-				result = result.Skip(toSkip);
-
-			var data = actualOffset >= this.PageSize ? new TEntity[0] : result.Take(this.PageSize - actualOffset).ToArray();
+			var data = this.OffsetOnPage >= this.PageSize ? new TEntity[0] : result.Take(this.PageSize - this.OffsetOnPage).ToArray();
 
 			var total = -1;
 			if (this.TotalNeeded)
 			{
-				if (this.PageIndex == 0 && data.Length + actualOffset < this.PageSize)
-					total = data.Length + actualOffset;
+				if (this.PageIndex == 0 && data.Length + this.OffsetOnPage < this.PageSize)
+					total = data.Length + this.OffsetOnPage;
 				else if (this.MaxPageCount != null)
 					total = (resource.Take(this.MaxPageCount.Value * this.PageSize - this.Offset)).Count();
 				else
@@ -147,9 +151,9 @@ namespace Clutch.Data
 
 		#region Static members
 
-		public static PagingOptions<TEntity> Create(int pageIndex, int pageSize, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
+		public static PagingOptions Create(int pageIndex, int pageSize, bool totalNeeded = true, int offset = 0, int? maxPageCount = null)
 		{
-			return new PagingOptions<TEntity>(pageIndex, pageSize, totalNeeded, offset);
+			return new PagingOptions(pageIndex, pageSize, totalNeeded: totalNeeded, offset: offset, maxPageCount: maxPageCount);
 		}
 
 		#endregion

@@ -10,7 +10,7 @@ namespace Clutch.Data
 		/// <summary>
 		/// Selects only part of a collection.
 		/// </summary>
-		public static CollectionPage<TEntity> ToCollectionPage<TEntity>(this IOrderedQueryable<TEntity> query, PagingOptions<TEntity> pagingOptions)
+		public static CollectionPage<TEntity> ToCollectionPage<TEntity>(this IQueryable<TEntity> query, PagingOptions pagingOptions)
 		{
 			return pagingOptions.Execute(query);
 		}
@@ -18,7 +18,7 @@ namespace Clutch.Data
 		/// <summary>
 		/// Selects only part of a collection.
 		/// </summary>
-		public static CollectionPage<TEntity> ToCollectionPage<TEntity>(this IEnumerable<TEntity> resource, PagingOptions<TEntity> pageOptions)
+		public static CollectionPage<TEntity> ToCollectionPage<TEntity>(this IEnumerable<TEntity> resource, PagingOptions pageOptions)
 		{
 			return pageOptions.Execute(resource);
 		}
