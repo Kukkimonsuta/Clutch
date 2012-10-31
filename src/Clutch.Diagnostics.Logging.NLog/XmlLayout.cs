@@ -71,9 +71,12 @@ namespace Clutch.Diagnostics.Logging.NLog
 				if (logEvent.Exception != null)
 					element.Add(FormatException(logEvent.Exception));
 
+				if (logEvent.Properties.ContainsKey("extendedInfo"))
+					element.Add(new XElement("extendedInfo", logEvent.Properties["extendedInfo"]));
+
 				foreach (var interceptor in LogEventInterceptorProviders.Providers.GetInterceptors())
 					interceptor.Render(wrappedEvent, element);
-				
+
 				element.Save(writer);
 			}
 

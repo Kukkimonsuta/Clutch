@@ -19,6 +19,7 @@ namespace Clutch.Diagnostics.EntityFramework.Tests
 		static DbTracingTests()
 		{
 			Bootstrap.Startup();
+			DbTracing.Enable();
 		}
 
 		private Mock<IDbTracingListener> MockListener()

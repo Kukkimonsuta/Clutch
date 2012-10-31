@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
+	[DebuggerStepThrough]
 	public class DbTracingConnection : DbConnection, ICloneable
 	{
 		public DbTracingConnection(DbConnection connection)

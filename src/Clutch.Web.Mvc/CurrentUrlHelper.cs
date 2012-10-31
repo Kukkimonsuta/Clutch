@@ -32,6 +32,9 @@ namespace Clutch.Web.Mvc
 		/// <summary>
 		/// Returns current url modified by parameters
 		/// </summary>
+		/// <remarks>
+		/// Removes keyless query string values
+		/// </remarks>
 		/// <param name="context">Relevant request context</param>
 		/// <param name="with">Values to add or override</param>
 		/// <param name="without">Values to remove if present</param>
@@ -44,7 +47,7 @@ namespace Clutch.Web.Mvc
 			var result = new RouteValueDictionary();
 
 			var queryString = context.HttpContext.Request.QueryString;
-			foreach (var key in queryString.AllKeys.Where(k => !IgnoreValues.Contains(k) && !IsGuid.IsMatch(k) && !without.Contains(k)))
+			foreach (var key in queryString.AllKeys.Where(k => k != null && !IgnoreValues.Contains(k) && !IsGuid.IsMatch(k) && !without.Contains(k)))
 				result[key] = queryString[key];
 
 			var routeValues = context.RouteData.Values;

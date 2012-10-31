@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonExtensions.cs" />
     <Compile Include="Data\CollectionPage.cs" />
     <Compile Include="Data\PagingExtensions.cs" />
     <Compile Include="Data\PagingOptions.cs" />

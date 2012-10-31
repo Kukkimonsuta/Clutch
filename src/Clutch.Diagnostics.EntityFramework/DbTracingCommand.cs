@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
+	[DebuggerStepThrough]
 	public class DbTracingCommand : DbCommand, ICloneable
 	{
 		public DbTracingCommand(DbCommand command, DbConnection connection)
