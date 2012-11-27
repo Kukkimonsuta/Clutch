@@ -13,6 +13,7 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 	{
 		private const string KEY_REQUEST_ID = "request.id";
 		private const string KEY_REQUEST_IP = "request.ip";
+		private const string KEY_REQUEST_METHOD = "request.method";
 		private const string KEY_REQUEST_URL = "request.url";
 		private const string KEY_REQUEST_REFERRER = "request.referrer";
 		private const string KEY_REQUEST_AGENT = "request.agent";
@@ -20,7 +21,11 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 		private const string KEY_REQUEST_POST = "request.post";
 
 		private RequestInterceptor()
-		{ }
+		{
+			CensorePasswords = true;
+		}
+
+		public bool CensorePasswords { get; set; }
 
 		#region ILogEventInterceptor
 
@@ -43,12 +48,13 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 
 			logEvent.Set(KEY_REQUEST_ID, request.GetRequestId());
 			logEvent.Set(KEY_REQUEST_IP, request.GetClientAddress());
+			logEvent.Set(KEY_REQUEST_METHOD, request.HttpMethod);
 			logEvent.Set(KEY_REQUEST_URL, request.Url);
 			logEvent.Set(KEY_REQUEST_REFERRER, request.UrlReferrer);
 			logEvent.Set(KEY_REQUEST_AGENT, request.UserAgent);
 
 			logEvent.Set(KEY_REQUEST_COOKIES, string.Join("; ", request.Cookies.AllKeys.Select(k => string.Format("{0} = '{1}'", k, request.Cookies[k].Value))));
-			logEvent.Set(KEY_REQUEST_POST, string.Join("; ", form.AllKeys.Select(k => string.Format("{0} = '{1}'", k, form[k]))));
+			logEvent.Set(KEY_REQUEST_POST, string.Join("; ", form.AllKeys.Select(k => string.Format("{0} = '{1}'", k, CensorePasswords && k.ToUpperInvariant().Contains("PASSWORD") ? "*******" : form[k]))));
 		}
 
 		public void Render(ILogEvent logEvent, XElement message)
@@ -60,6 +66,7 @@ namespace Clutch.Web.Diagnostics.Logging.Interceptors
 			}
 			requestElement.SetAttributeValue("id", logEvent.TryGet(KEY_REQUEST_ID, null));
 			requestElement.SetAttributeValue("ip", logEvent.TryGet(KEY_REQUEST_IP, null));
+			requestElement.SetAttributeValue("method", logEvent.TryGet(KEY_REQUEST_METHOD, null));
 			requestElement.SetAttributeValue("url", logEvent.TryGet(KEY_REQUEST_URL, null));
 			requestElement.SetAttributeValue("referrer", logEvent.TryGet(KEY_REQUEST_REFERRER, null));
 

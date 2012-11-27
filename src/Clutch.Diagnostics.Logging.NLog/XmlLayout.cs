@@ -31,6 +31,7 @@ namespace Clutch.Diagnostics.Logging.NLog
 		private XElement FormatException(Exception exception, string elementName = "exception")
 		{
 			var element = new XElement(elementName,
+				new XAttribute("type", exception.GetType().FullName),
 				new XAttribute("message", exception.Message)
 			);
 
@@ -71,8 +72,9 @@ namespace Clutch.Diagnostics.Logging.NLog
 				if (logEvent.Exception != null)
 					element.Add(FormatException(logEvent.Exception));
 
-				if (logEvent.Properties.ContainsKey("extendedInfo"))
-					element.Add(new XElement("extendedInfo", logEvent.Properties["extendedInfo"]));
+				object extendedInfo;
+				if (logEvent.Properties.TryGetValue("extendedInfo", out extendedInfo) && extendedInfo != null)
+					element.Add(new XElement("extendedInfo", extendedInfo));
 
 				foreach (var interceptor in LogEventInterceptorProviders.Providers.GetInterceptors())
 					interceptor.Render(wrappedEvent, element);
