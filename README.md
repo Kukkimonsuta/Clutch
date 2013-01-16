@@ -32,7 +32,7 @@ Example configuration for web project:
 ```c#
 protected void Application_Start()
 {
-    DbTracing.Initialize();
+    DbTracing.Enable();
     DbTracing.AddListener(new NLogDbTracingListener());
 }
 ```
