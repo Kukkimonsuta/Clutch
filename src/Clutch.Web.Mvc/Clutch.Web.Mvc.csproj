@@ -49,6 +49,7 @@
     <Compile Include="Ref.cs" />
     <Compile Include="ResourceHelper.cs" />
     <Compile Include="CurrentUrlHelper.cs" />
+    <Compile Include="RoutingExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Clutch.Web\Clutch.Web.csproj">
