@@ -102,7 +102,7 @@ namespace Clutch.Web.Mvc
             var routeValues = Current(self.RequestContext, with, without);
 
             // makes sure that "without" parameter works
-            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext(new Uri("/")));
+            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext("/"));
 
             return urlHelper.Action(null, routeValues);
         }
@@ -158,7 +158,7 @@ namespace Clutch.Web.Mvc
             var routeValues = Current(self.ViewContext.RequestContext, with, without);
 
             // makes sure that "without" parameter works
-            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext(new Uri("/")));
+            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext("/"));
 
             TagBuilder builder = new TagBuilder("a");
             builder.InnerHtml = !string.IsNullOrEmpty(linkText) ? HttpUtility.HtmlEncode(linkText) : string.Empty;
@@ -194,7 +194,7 @@ namespace Clutch.Web.Mvc
             var routeValues = ParentCurrent(self.ViewContext.RequestContext, with, without);
 
             // makes sure that "without" parameter works
-            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext(new Uri("/")));
+            var urlHelper = new UrlHelper(RoutingExtensions.CreateFakeRequestContext("/"));
 
             TagBuilder builder = new TagBuilder("a");
             builder.InnerHtml = !string.IsNullOrEmpty(linkText) ? HttpUtility.HtmlEncode(linkText) : string.Empty;

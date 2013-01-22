@@ -10,46 +10,25 @@ namespace Clutch.Web.Mvc
     public static class RoutingExtensions
     {
         /// <summary>
-        /// Matches url against routes
-        /// </summary>
-        /// <remarks>
-        /// This method is unsafe when using constraits that depend on headers or other values from context/request
-        /// </remarks>
-        /// <param name="routeCollection">Route collection</param>
-        /// <param name="uriString">Uri string</param>
-        /// <param name="method">Http method</param>
-        /// <returns>RouteData or null</returns>
-        public static RouteData GetRouteData(this RouteCollection routeCollection, string uriString, string method = "GET")
-        {
-            if (routeCollection == null)
-                throw new ArgumentNullException("routeCollection");
-            if (uriString == null)
-                throw new ArgumentNullException("uriString");
-            if (method == null)
-                throw new ArgumentNullException("method");
-
-            return GetRouteData(routeCollection, new Uri(uriString), method: method);
-        }
-        /// <summary>
         /// Matches uri against routes
         /// </summary>
         /// <remarks>
         /// This method is unsafe when using constraits that depend on headers or other values from context/request
         /// </remarks>
         /// <param name="routeCollection">Route collection</param>
-        /// <param name="uri">Uri</param>
+        /// <param name="absolutePathAndQuery">Absolute path and query</param>
         /// <param name="method">Http method</param>
         /// <returns>RouteData or null</returns>
-        public static RouteData GetRouteData(this RouteCollection routeCollection, Uri uri, string method = "GET")
+        public static RouteData GetRouteData(this RouteCollection routeCollection, string absolutePathAndQuery, string method = "GET")
         {
             if (routeCollection == null)
                 throw new ArgumentNullException("routeCollection");
-            if (uri == null)
-                throw new ArgumentNullException("uri");
+            if (absolutePathAndQuery == null)
+                throw new ArgumentNullException("absolutePathAndQuery");
             if (method == null)
                 throw new ArgumentNullException("method");
 
-            var httpContext = CreateFakeHttpContext(uri, method: method);
+            var httpContext = CreateFakeHttpContext(absolutePathAndQuery, method: method);
 
             return routeCollection.GetRouteData(httpContext);
         }
@@ -65,7 +44,7 @@ namespace Clutch.Web.Mvc
             if (routeCollection == null)
                 throw new ArgumentNullException("routeCollection");
 
-            var requestContext = CreateFakeRequestContext(new Uri("/"));
+            var requestContext = CreateFakeRequestContext("/");
 
             return routeCollection.GetVirtualPath(requestContext, values);
         }
@@ -81,43 +60,43 @@ namespace Clutch.Web.Mvc
             if (routeCollection == null)
                 throw new ArgumentNullException("routeCollection");
 
-            var requestContext = CreateFakeRequestContext(new Uri("/"));
+            var requestContext = CreateFakeRequestContext("/");
 
             return routeCollection.GetVirtualPath(requestContext, name, values);
         }
 
-        internal static RequestContext CreateFakeRequestContext(Uri uri, string method = "GET")
+        internal static RequestContext CreateFakeRequestContext(string absolutePathAndQuery, string method = "GET")
         {
-            if (uri == null)
-                throw new ArgumentNullException("uri");
+            if (absolutePathAndQuery == null)
+                throw new ArgumentNullException("absolutePathAndQuery");
             if (method == null)
                 throw new ArgumentNullException("method");
 
-            var httpContext = CreateFakeHttpContext(uri, method: method);
+            var httpContext = CreateFakeHttpContext(absolutePathAndQuery, method: method);
 
             return new RequestContext(httpContext, new RouteData());
         }
 
-        internal static FakeHttpContext CreateFakeHttpContext(Uri uri, string method = "GET")
+        internal static FakeHttpContext CreateFakeHttpContext(string absolutePathAndQuery, string method = "GET")
         {
-            if (uri == null)
-                throw new ArgumentNullException("uri");
+            if (absolutePathAndQuery == null)
+                throw new ArgumentNullException("absolutePathAndQuery");
             if (method == null)
                 throw new ArgumentNullException("method");
 
-            var httpRequest = CreateFakeHttpRequest(uri, method: method);
+            var httpRequest = CreateFakeHttpRequest(absolutePathAndQuery, method: method);
 
             return new FakeHttpContext(httpRequest);
         }
 
-        internal static FakeHttpRequest CreateFakeHttpRequest(Uri uri, string method = "GET")
+        internal static FakeHttpRequest CreateFakeHttpRequest(string absolutePathAndQuery, string method = "GET")
         {
-            if (uri == null)
-                throw new ArgumentNullException("uri");
+            if (absolutePathAndQuery == null)
+                throw new ArgumentNullException("absolutePathAndQuery");
             if (method == null)
                 throw new ArgumentNullException("method");
 
-            return new FakeHttpRequest(uri, method: method);
+            return new FakeHttpRequest(absolutePathAndQuery, method: method);
         }
 
         #region Nested type: FakeHttpContext
@@ -130,6 +109,7 @@ namespace Clutch.Web.Mvc
             }
 
             private HttpRequestBase request;
+            private HttpResponseBase response;
 
             public override HttpRequestBase Request
             {
@@ -137,6 +117,34 @@ namespace Clutch.Web.Mvc
                 {
                     return request;
                 }
+            }
+
+            public override HttpResponseBase Response
+            {
+                get
+                {
+                    if (response == null)
+                        response = new FakeHttpResponse();
+
+                    return response;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Nested type: FakeHttpResponse
+
+        internal class FakeHttpResponse : HttpResponseBase
+        {
+            public FakeHttpResponse()
+            { 
+            }
+
+            public override string ApplyAppPathModifier(string virtualPath)
+            {
+                // this should be handled better probably, for now this is sufficient
+                return HttpContext.Current.Response.ApplyAppPathModifier(virtualPath);
             }
         }
 
@@ -146,9 +154,17 @@ namespace Clutch.Web.Mvc
 
         internal class FakeHttpRequest : HttpRequestBase
         {
-            public FakeHttpRequest(Uri uri, string method = "GET")
+            public FakeHttpRequest(string absolutePathAndQuery, string method = "GET")
             {
-                this.uri = uri;
+                if (absolutePathAndQuery == null)
+                    throw new ArgumentNullException("absolutePathAndQuery");
+                if (method == null)
+                    throw new ArgumentNullException("method");
+
+                if (!absolutePathAndQuery.StartsWith("/"))
+                    absolutePathAndQuery = "/" + absolutePathAndQuery;
+
+                this.uri = new Uri("http://localhost" + absolutePathAndQuery);
                 this.method = method.ToUpperInvariant();
             }
 
