@@ -53,6 +53,8 @@
     <Compile Include="DbTracingConnection.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DbTracingContext.cs" />
+    <Compile Include="DbTracingDataReader.cs" />
     <Compile Include="DbTracingExtensions.cs" />
     <Compile Include="DbTracingProviderFactory.cs" />
     <Compile Include="DbTracingProviderServices.cs" />

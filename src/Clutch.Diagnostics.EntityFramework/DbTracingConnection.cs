@@ -6,7 +6,9 @@ using System.Reflection;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
+#if !DEBUG
 	[DebuggerStepThrough]
+#endif
 	public class DbTracingConnection : DbConnection, ICloneable
 	{
 		public DbTracingConnection(DbConnection connection)

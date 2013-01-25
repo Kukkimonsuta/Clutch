@@ -14,93 +14,109 @@ using Clutch.Runtime;
 
 namespace Clutch.Diagnostics.EntityFramework.Tests
 {
-	public class DbTracingTests
-	{
-		static DbTracingTests()
-		{
-			Bootstrap.Startup();
-			DbTracing.Enable();
-		}
+    public class DbTracingTests
+    {
+        static DbTracingTests()
+        {
+            Bootstrap.Startup();
+            DbTracing.Enable();
+        }
 
-		private Mock<IDbTracingListener> MockListener()
-		{
-			var mock = new Mock<IDbTracingListener>();
+        private Mock<IDbTracingListener> MockListener(bool fail = false, bool reader = false)
+        {
+            var mock = new Mock<IDbTracingListener>();
 
-			mock
-				.Setup(l => l.CommandExecuting(It.IsAny<DbConnection>(), It.IsAny<DbCommand>()))
-				.Callback((DbConnection connection, DbCommand command) =>
-				{
-					Assert.NotNull(connection);
-					Assert.NotNull(command);
-				})
-				.Verifiable();
-			mock
-				.Setup(l => l.CommandFinished(It.IsAny<DbConnection>(), It.IsAny<DbCommand>(), It.IsAny<object>(), It.IsAny<TimeSpan>()))
-				.Callback((DbConnection connection, DbCommand command, object result, TimeSpan duration) =>
-				{
-					Assert.NotNull(connection);
-					Assert.NotNull(command);
-				})
-				.Verifiable();
-			mock
-				.Verify(l => l.CommandFailed(It.IsAny<DbConnection>(), It.IsAny<DbCommand>(), It.IsAny<Exception>(), It.IsAny<TimeSpan>()), Times.Never());
-			mock
-				.Setup(l => l.CommandExecuted(It.IsAny<DbConnection>(), It.IsAny<DbCommand>(), It.IsAny<object>(), It.IsAny<TimeSpan>()))
-				.Callback((DbConnection connection, DbCommand command, object result, TimeSpan duration) =>
-				{
-					Assert.NotNull(connection);
-					Assert.NotNull(command);
-				})
-				.Verifiable();
+            mock
+                .Setup(l => l.CommandExecuting(It.IsAny<DbTracingContext>()))
+                .Callback((DbTracingContext context) =>
+                {
+                    Assert.NotNull(context);
+                    Assert.NotNull(context.Command);
+                })
+                .Verifiable();
+            mock
+                .Setup(l => l.CommandFinished(It.IsAny<DbTracingContext>()))
+                .Callback((DbTracingContext context) =>
+                {
+                    Assert.NotNull(context);
+                    Assert.NotNull(context.Command);
+                    Assert.NotNull(context.Duration);
+                })
+                .Verifiable();
+            if (fail)
+            {
+                mock
+                    .Verify(l => l.CommandFailed(It.IsAny<DbTracingContext>()));
+            }
+            if (reader)
+            {
+                mock
+                    .Setup(l => l.ReaderFinished(It.IsAny<DbTracingContext>()))
+                    .Callback((DbTracingContext context) =>
+                    {
+                        Assert.NotNull(context);
+                        Assert.NotNull(context.Command);
+                        Assert.NotNull(context.ReaderDuration);
+                    })
+                    .Verifiable();
+            }
+            mock
+                .Setup(l => l.CommandExecuted(It.IsAny<DbTracingContext>()))
+                .Callback((DbTracingContext context) =>
+                {
+                    Assert.NotNull(context);
+                    Assert.NotNull(context.Command);
+                })
+                .Verifiable();
 
-			return mock;
-		}
+            return mock;
+        }
 
-		[Fact]
-		public void Can_catch_entity_framework_command()
-		{
-			var mock = MockListener();
+        [Fact]
+        public void Can_catch_entity_framework_command()
+        {
+            var mock = MockListener(reader: true);
 
-			DbTracing.AddListener(mock.Object);
-			try
-			{
-				using (var context = new CodeFirstContext())
-				{
-					context.TestEntity1.Add(new TestEntity1());
-					context.TestEntity2.Add(new TestEntity2());
+            DbTracing.AddListener(mock.Object);
+            try
+            {
+                using (var context = new CodeFirstContext())
+                {
+                    context.TestEntity1.Add(new TestEntity1());
+                    context.TestEntity2.Add(new TestEntity2());
 
-					context.SaveChanges();
-				}
-			}
-			finally
-			{
-				DbTracing.RemoveListener(mock.Object);
-			}
+                    context.SaveChanges();
+                }
+            }
+            finally
+            {
+                DbTracing.RemoveListener(mock.Object);
+            }
 
-			mock.Verify();
-		}
+            mock.Verify();
+        }
 
-		[Fact]
-		public void Can_catch_execute_sql_command()
-		{
-			var mock = MockListener();
+        [Fact]
+        public void Can_catch_execute_sql_command()
+        {
+            var mock = MockListener();
 
-			DbTracing.AddListener(mock.Object);
-			try
-			{
-				using (var context = new CodeFirstContext())
-				{
-					context.Database.ExecuteSqlCommand("select 1; select @date", new SqlParameter("date", DateTime.Now));
+            DbTracing.AddListener(mock.Object);
+            try
+            {
+                using (var context = new CodeFirstContext())
+                {
+                    context.Database.ExecuteSqlCommand("select 1; select @date", new SqlParameter("date", DateTime.Now));
 
-					context.SaveChanges();
-				}
-			}
-			finally
-			{
-				DbTracing.RemoveListener(mock.Object);
-			}
+                    context.SaveChanges();
+                }
+            }
+            finally
+            {
+                DbTracing.RemoveListener(mock.Object);
+            }
 
-			mock.Verify();
-		}
-	}
+            mock.Verify();
+        }
+    }
 }
