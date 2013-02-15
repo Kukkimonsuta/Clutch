@@ -50,6 +50,8 @@
     <Compile Include="ResourceHelper.cs" />
     <Compile Include="CurrentUrlHelper.cs" />
     <Compile Include="RoutingExtensions.cs" />
+    <Compile Include="Routing\MvcComplexRoute.cs" />
+    <Compile Include="Routing\RouteCollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Clutch.Web\Clutch.Web.csproj">
@@ -61,6 +63,7 @@
       <Name>Clutch</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -48,6 +48,9 @@
     <Compile Include="Data\SortOptions.cs" />
     <Compile Include="Runtime\Bootstrap.cs" />
     <Compile Include="Runtime\BootstrapSubscriber.cs" />
+    <Compile Include="Runtime\Caching\CacheEntry.cs" />
+    <Compile Include="Runtime\Caching\MemoryCache.cs" />
+    <Compile Include="Runtime\Caching\MemoryCacheRegion.cs" />
     <Compile Include="Runtime\ExecutionScope.cs" />
     <Compile Include="Runtime\IExecutionScopeBehavior.cs" />
     <Compile Include="Runtime\IExecutionScopeStrategy.cs" />

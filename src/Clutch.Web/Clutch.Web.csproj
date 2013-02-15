@@ -43,6 +43,11 @@
   <ItemGroup>
     <Compile Include="HtmlAttributeDictionary.cs" />
     <Compile Include="Ref.cs" />
+    <Compile Include="Routing\ComplexRoute.cs" />
+    <Compile Include="Routing\RouteDirectionConstraint.cs" />
+    <Compile Include="Routing\RouteRule.cs" />
+    <Compile Include="Routing\TokenCollection.cs" />
+    <Compile Include="Routing\TokenRouteRule.cs" />
     <Compile Include="WebBootstrap.cs" />
     <Compile Include="Runtime\HttpContextScopeStrategy.cs" />
     <Compile Include="WebExtensions.cs" />
@@ -54,6 +59,7 @@
       <Name>Clutch</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

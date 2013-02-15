@@ -8,9 +8,7 @@ using System.Text;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-#if !DEBUG
     [DebuggerStepThrough]
-#endif
     public class DbTracingDataReader : DbDataReader
     {
         public DbTracingDataReader(DbDataReader reader, DbTracingContext context)
