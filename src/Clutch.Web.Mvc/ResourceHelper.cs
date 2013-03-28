@@ -158,7 +158,7 @@ namespace Clutch.Web.Mvc
         /// <param name="styleName">Style name</param>
         /// <param name="ignoreMinified">Don't serve minified style</param>
         /// <returns>Style element</returns>
-        public static MvcHtmlString Style(this HtmlHelper htmlHelper, string styleName, string suffix = null, bool ignoreMinified = false, bool includeRevision = true)
+        public static MvcHtmlString Style(this HtmlHelper htmlHelper, string styleName, string suffix = null, bool ignoreMinified = false, bool includeRevision = true, string media = null)
         {
             if (htmlHelper == null)
                 throw new ArgumentNullException("htmlHelper");
@@ -172,6 +172,8 @@ namespace Clutch.Web.Mvc
             linkTag.Attributes.Add("href", styleUrl);
             linkTag.Attributes.Add("rel", "stylesheet");
             linkTag.Attributes.Add("type", "text/css");
+            if (media != null)
+                linkTag.Attributes.Add("media", media);
 
             return MvcHtmlString.Create(linkTag.ToString(TagRenderMode.SelfClosing));
         }
