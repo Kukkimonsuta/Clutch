@@ -174,6 +174,15 @@ namespace Clutch.Web.Mvc
             private string path;
             private string appRelativeCurrentExecutionFilePath;
 
+            public override System.Collections.Specialized.NameValueCollection ServerVariables
+            {
+                get
+                {
+                    // this should be handled better probably, for now this is sufficient
+                    return HttpContext.Current.Request.ServerVariables;
+                }
+            }
+
             public override string HttpMethod
             {
                 get
