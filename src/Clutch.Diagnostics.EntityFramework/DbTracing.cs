@@ -89,6 +89,20 @@ namespace Clutch.Diagnostics.EntityFramework
             }
         }
 
+        public static void AddListeners(params IDbTracingListener[] listeners)
+        {
+            rwLock.EnterWriteLock();
+            try
+            {
+                foreach (var listener in listeners)
+                    DbTracing.listeners.Add(listener);
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
+            }
+        }
+
         public static void RemoveListener(IDbTracingListener listener)
         {
             rwLock.EnterWriteLock();
@@ -102,9 +116,11 @@ namespace Clutch.Diagnostics.EntityFramework
             }
         }
 
-        public static void Enable()
+        public static void Enable(params IDbTracingListener[] listeners)
         {
             Initialize();
+
+            AddListeners(listeners);
 
             enabled = true;
         }

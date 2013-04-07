@@ -41,29 +41,39 @@ namespace Clutch.Diagnostics.EntityFramework
         private Action<DbTracingContext> onFailed;
         private Action<DbTracingContext> onExecuted;
 
-        public void OnExecuting(Action<DbTracingContext> handler)
+        public GenericDbTracingListener OnExecuting(Action<DbTracingContext> handler)
         {
             onExecuting = handler;
+
+            return this;
         }
 
-        public void OnFinished(Action<DbTracingContext> handler)
+        public GenericDbTracingListener OnFinished(Action<DbTracingContext> handler)
         {
             onFinished = handler;
+
+            return this;
         }
 
-        public void OnReaderFinished(Action<DbTracingContext> handler)
+        public GenericDbTracingListener OnReaderFinished(Action<DbTracingContext> handler)
         {
             onReaderFinished = handler;
+
+            return this;
         }
 
-        public void OnFailed(Action<DbTracingContext> handler)
+        public GenericDbTracingListener OnFailed(Action<DbTracingContext> handler)
         {
             onFailed = handler;
+
+            return this;
         }
 
-        public void OnExecuted(Action<DbTracingContext> handler)
+        public GenericDbTracingListener OnExecuted(Action<DbTracingContext> handler)
         {
             onExecuted = handler;
+
+            return this;
         }
 
         #region IDbTracingListener
