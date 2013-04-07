@@ -4,36 +4,16 @@
 
 Provides api for tracing EntityFramework sql commands.
 
-Example listener:
-
-```c#
-public class NLogDbTracingListener : IDbTracingListener
-{
-  private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
-  void IDbTracingListener.CommandExecuted(DbConnection connection, DbCommand command, object result, TimeSpan duration)
-  { }
-  
-  void IDbTracingListener.CommandExecuting(DbConnection connection, DbCommand command)
-  { }
-  
-  void IDbTracingListener.CommandFailed(DbConnection connection, DbCommand command, Exception exception, TimeSpan duration)
-  { }
-  
-  void IDbTracingListener.CommandFinished(DbConnection connection, DbCommand command, object result, TimeSpan duration)
-  {
-    logger.Trace("-- time: {0}{1}{2}", duration, Environment.NewLine, command.ToTraceString());
-  }
-}
-```
-
 Example configuration for web project:
 
 ```c#
 protected void Application_Start()
 {
-    DbTracing.Enable();
-    DbTracing.AddListener(new NLogDbTracingListener());
+    DbTracing.Enable(
+        new GenericDbTracingListener()
+            .OnFinished(c => logger.Trace("-- Command finished - time: {0}{1}{2}", c.Duration, Environment.NewLine, c.Command.ToTraceString()))
+            .OnFailed(c => logger.Trace("-- Command failed - time: {0}{1}{2}", c.Duration, Environment.NewLine, c.Command.ToTraceString()))
+    );
 }
 ```
 
