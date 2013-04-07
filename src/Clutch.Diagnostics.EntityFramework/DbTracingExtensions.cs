@@ -1,30 +1,39 @@
-﻿using System.Data.Common;
-using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
 namespace Clutch.Diagnostics.EntityFramework
 {
-	public static class DbTracingExtensions
-	{
-		public static string ToTraceString(this DbCommand command)
-		{
-			var builder = new StringBuilder();
-			var parameters = command.Parameters.Cast<SqlParameter>().ToArray();
+    public static class DbTracingExtensions
+    {
+        private static string FormatValue(DbType type, object value)
+        {
+            if (value == null)
+                return "null";
 
-			foreach (var parameter in parameters)
-			{
-				var parameterName = parameter.ParameterName.StartsWith("@") ? parameter.ParameterName : "@" + parameter.ParameterName;
-				
-				builder.AppendFormat("declare {0} {1} = cast(N'{2}' as {1});", parameterName, parameter.SqlDbType, parameter.SqlValue);
-				builder.AppendLine();
-			}
-			if (parameters.Any())
-				builder.AppendLine();
+            return string.Format(CultureInfo.InvariantCulture, "cast(N'{1}' as {0})", type, value);
+        }
 
-			builder.AppendLine(command.CommandText);
+        public static string ToTraceString(this DbCommand command)
+        {
+            var builder = new StringBuilder();
+            var parameters = command.Parameters.Cast<DbParameter>().ToArray();
 
-			return builder.ToString();
-		}
-	}
+            foreach (var parameter in parameters)
+            {
+                var parameterName = parameter.ParameterName.StartsWith("@") ? parameter.ParameterName : "@" + parameter.ParameterName;
+
+                builder.AppendFormat(CultureInfo.InvariantCulture, "declare {0} {1} = {2};", parameterName, parameter.DbType, FormatValue(parameter.DbType, parameter.Value));
+                builder.AppendLine();
+            }
+            if (parameters.Any())
+                builder.AppendLine();
+
+            builder.AppendLine(command.CommandText);
+
+            return builder.ToString();
+        }
+    }
 }
