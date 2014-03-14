@@ -9,7 +9,7 @@ namespace Clutch
 {
 	public static class StringExtensions
 	{
-		private static readonly Regex DoubleUnderscores = new Regex("__", RegexOptions.Compiled);
+		private static readonly Regex DoubleUnderscores = new Regex("__+", RegexOptions.Compiled);
 
 		/// <summary>
 		/// Replaces invalid file name characters with underscores

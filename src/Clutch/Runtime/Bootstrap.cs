@@ -220,7 +220,7 @@ namespace Clutch.Runtime
 		#region Configuration
 
 		public static readonly IList<string> AllowedAssemblyNames = new List<string>() { };
-		public static readonly IList<string> AllowedAssemblyPublicKeys = new List<string>() { null };
+		public static readonly IList<string> AllowedAssemblyPublicKeys = new List<string>() { null, "3f1ee76c0d32d23b" };
 		public static readonly IList<string> IgnoredCodeGeneratorTools = new List<string> { "ASP.NET" };
 
 		#endregion

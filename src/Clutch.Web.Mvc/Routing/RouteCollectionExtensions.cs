@@ -8,56 +8,77 @@ using System.Web.Routing;
 
 namespace Clutch.Web.Mvc.Routing
 {
-    public static class RouteCollectionExtensions
-    {
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules)
-        {
-            return routes.MapComplexRoute(name, url, rules, null, null);
-        }
+	public static class RouteCollectionExtensions
+	{
+		#region Complex route
 
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults)
-        {
-            return routes.MapComplexRoute(name, url, rules, defaults, null);
-        }
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules)
+		{
+			return routes.MapComplexRoute(name, url, rules, null, null);
+		}
 
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, string[] namespaces)
-        {
-            return routes.MapComplexRoute(name, url, rules, null, null, namespaces);
-        }
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults)
+		{
+			return routes.MapComplexRoute(name, url, rules, defaults, null);
+		}
 
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, object constraints)
-        {
-            return routes.MapComplexRoute(name, url, rules, defaults, constraints, null);
-        }
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, string[] namespaces)
+		{
+			return routes.MapComplexRoute(name, url, rules, null, null, namespaces);
+		}
 
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, string[] namespaces)
-        {
-            return routes.MapComplexRoute(name, url, rules, defaults, null, namespaces);
-        }
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, object constraints)
+		{
+			return routes.MapComplexRoute(name, url, rules, defaults, constraints, null);
+		}
 
-        public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, object constraints, string[] namespaces)
-        {
-            if (routes == null)
-                throw new ArgumentNullException("routes");
-            if (url == null)
-                throw new ArgumentNullException("url");
-            if (rules == null)
-                throw new ArgumentNullException("rules");
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, string[] namespaces)
+		{
+			return routes.MapComplexRoute(name, url, rules, defaults, null, namespaces);
+		}
 
-            var route = new MvcComplexRoute(url, new RouteValueDictionary(rules), new MvcRouteHandler())
-            {
-                Defaults = new RouteValueDictionary(defaults),
-                Constraints = new RouteValueDictionary(constraints),
-                DataTokens = new RouteValueDictionary()
-            };
+		public static Route MapComplexRoute(this RouteCollection routes, string name, string url, object rules, object defaults, object constraints, string[] namespaces)
+		{
+			if (routes == null)
+				throw new ArgumentNullException("routes");
+			if (url == null)
+				throw new ArgumentNullException("url");
+			if (rules == null)
+				throw new ArgumentNullException("rules");
 
-            if ((namespaces != null) && (namespaces.Length > 0))
-            {
-                route.DataTokens["Namespaces"] = namespaces;
-            }
-            routes.Add(name, route);
+			var route = new MvcComplexRoute(url, new RouteValueDictionary(rules), new MvcRouteHandler())
+			{
+				Defaults = new RouteValueDictionary(defaults),
+				Constraints = new RouteValueDictionary(constraints),
+				DataTokens = new RouteValueDictionary()
+			};
 
-            return route;
-        }
-    }
+			if ((namespaces != null) && (namespaces.Length > 0))
+			{
+				route.DataTokens["Namespaces"] = namespaces;
+			}
+			routes.Add(name, route);
+
+			return route;
+		}
+
+		#endregion
+
+		#region Areas
+
+		public static void RegisterArea<T>(this RouteCollection routes, object state = null)
+			where T : AreaRegistration
+		{
+			var registration = (AreaRegistration)Activator.CreateInstance(typeof(T));
+			var context = new AreaRegistrationContext(registration.AreaName, routes, state);
+
+			var ns = registration.GetType().Namespace;
+			if (ns != null)
+				context.Namespaces.Add(ns + ".*");
+
+			registration.RegisterArea(context);
+		}
+
+		#endregion
+	}
 }

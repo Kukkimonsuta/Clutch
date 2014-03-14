@@ -110,6 +110,18 @@ namespace Clutch.Web.Mvc
 
             private HttpRequestBase request;
             private HttpResponseBase response;
+			private Dictionary<object, object> items;
+
+			public override System.Collections.IDictionary Items
+			{
+				get
+				{
+					if (items == null)
+						items = new Dictionary<object, object>();
+
+					return items;
+				}
+			}
 
             public override HttpRequestBase Request
             {
