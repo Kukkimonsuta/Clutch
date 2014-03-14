@@ -112,6 +112,11 @@ namespace Clutch.Web.Mvc
             private HttpResponseBase response;
 			private Dictionary<object, object> items;
 
+			public override object GetService(Type serviceType)
+			{
+				return null;
+			}
+
 			public override System.Collections.IDictionary Items
 			{
 				get
