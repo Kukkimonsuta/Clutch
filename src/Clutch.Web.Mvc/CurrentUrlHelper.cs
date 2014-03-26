@@ -55,6 +55,10 @@ namespace Clutch.Web.Mvc
             foreach (var pair in routeValues.Where(p => !IgnoreValues.Contains(p.Key) && !IsGuid.IsMatch(p.Key) && !without.Contains(p.Key)))
                 result[pair.Key] = pair.Value;
 
+			var area = context.RouteData.DataTokens["area"];
+			if (area != null && !without.Contains("area"))
+				result["area"] = area;
+
             foreach (var pair in with.Where(p => !IgnoreValues.Contains(p.Key) && !IsGuid.IsMatch(p.Key) && !without.Contains(p.Key)))
                 result[pair.Key] = pair.Value;
 
