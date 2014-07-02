@@ -51,14 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AreaAuthorizeAttribute.cs" />
+    <Compile Include="HtmlHelperExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ref.cs" />
+    <Compile Include="RequireRequestValueAttribute.cs" />
     <Compile Include="ResourceHelper.cs" />
     <Compile Include="CurrentUrlHelper.cs" />
     <Compile Include="RoutingExtensions.cs" />
     <Compile Include="Routing\AreaRegistrationContextExtensions.cs" />
     <Compile Include="Routing\MvcComplexRoute.cs" />
     <Compile Include="Routing\RouteCollectionExtensions.cs" />
+    <Compile Include="TagBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Clutch.Web\Clutch.Web.csproj">
