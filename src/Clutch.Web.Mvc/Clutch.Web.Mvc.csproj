@@ -60,6 +60,8 @@
     <Compile Include="CurrentUrlHelper.cs" />
     <Compile Include="RoutingExtensions.cs" />
     <Compile Include="Routing\AreaRegistrationContextExtensions.cs" />
+    <Compile Include="Routing\CultureConstraint.cs" />
+    <Compile Include="Routing\FluentRouter.cs" />
     <Compile Include="Routing\MvcComplexRoute.cs" />
     <Compile Include="Routing\RouteCollectionExtensions.cs" />
     <Compile Include="TagBuilderExtensions.cs" />
