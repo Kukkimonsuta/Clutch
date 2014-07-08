@@ -61,6 +61,11 @@
     <Compile Include="Runtime\IExecutionScopeBehavior.cs" />
     <Compile Include="Runtime\IExecutionScopeStrategy.cs" />
     <Compile Include="Runtime\LocalDataStoreScopeBehavior.cs" />
+    <Compile Include="Security\Identity.cs" />
+    <Compile Include="Security\IPrincipalExtensions.cs" />
+    <Compile Include="Security\Permission.cs" />
+    <Compile Include="Security\Principal.cs" />
+    <Compile Include="Security\Role.cs" />
     <Compile Include="TemporaryActionBase.cs" />
     <Compile Include="Infrastructure\IApplicationConfigurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -72,6 +77,7 @@
       <Link>kukkimonsuta.pfx</Link>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
