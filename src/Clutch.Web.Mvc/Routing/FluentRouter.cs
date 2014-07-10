@@ -19,11 +19,14 @@ namespace Clutch.Web.Mvc.Routing
 
 			m_routes = routes;
 			m_areaName = areaName;
+
+			m_scopes = new Stack<Action<IFluentRouteConfiguration>>();
 		}
 
 		private RouteCollection m_routes;
 		private string m_areaName;
 		private Action<IFluentRouteConfiguration> m_template;
+		private Stack<Action<IFluentRouteConfiguration>> m_scopes;
 
 		private Route Create(string name, string url, FluentRouteConfiguration config)
 		{
@@ -70,6 +73,24 @@ namespace Clutch.Web.Mvc.Routing
 		}
 
 		/// <summary>
+		/// Allows use of new template after the old one.
+		/// </summary>
+		public FluentRouter Scope(Action<FluentRouter> scope)
+		{
+			m_scopes.Push(m_template);
+			try
+			{
+				scope(this);
+			}
+			finally
+			{
+				m_template = m_scopes.Pop();
+			}
+
+			return this;
+		}
+
+		/// <summary>
 		/// Maps new route according to configuration
 		/// </summary>
 		public FluentRouter Map(string name, Action<IFluentRouteConfiguration> configuration)
@@ -81,6 +102,9 @@ namespace Clutch.Web.Mvc.Routing
 
 			var config = new FluentRouteConfiguration();
 
+			foreach (var template in m_scopes.Where(s => s != null))
+				template(config);
+
 			if (m_template != null)
 				m_template(config);
 
@@ -88,6 +112,9 @@ namespace Clutch.Web.Mvc.Routing
 
 			// create new route for each url; first url is considered to be default
 			var urls = config.Urls.Reverse().ToArray();
+
+			if (!string.IsNullOrEmpty(config.NamePrefix))
+				name = config.NamePrefix + "_" + name;
 
 			for (var i = 0; i < urls.Length; i++)
 			{
@@ -114,21 +141,23 @@ namespace Clutch.Web.Mvc.Routing
 
 	public interface IFluentRouteConfiguration
 	{
+		IFluentRouteConfiguration NamePrefix(string prefix, bool append = true);
+
 		IFluentRouteConfiguration Url(string culture, string url);
 
-		IFluentRouteConfiguration Defaults(object defaults);
-		IFluentRouteConfiguration Defaults(RouteValueDictionary defaults);
+		IFluentRouteConfiguration Defaults(object defaults, bool merge = true);
+		IFluentRouteConfiguration Defaults(RouteValueDictionary defaults, bool merge = true);
 
-		IFluentRouteConfiguration Constraints(object constraints);
-		IFluentRouteConfiguration Constraints(RouteValueDictionary constraints);
+		IFluentRouteConfiguration Constraints(object constraints, bool merge = true);
+		IFluentRouteConfiguration Constraints(RouteValueDictionary constraints, bool merge = true);
 
-		IFluentRouteConfiguration DataTokens(object dataTokens);
-		IFluentRouteConfiguration DataTokens(RouteValueDictionary dataTokens);
+		IFluentRouteConfiguration DataTokens(object dataTokens, bool merge = true);
+		IFluentRouteConfiguration DataTokens(RouteValueDictionary dataTokens, bool merge = true);
 
-		IFluentRouteConfiguration Rules(object rules);
-		IFluentRouteConfiguration Rules(RouteValueDictionary rules);
+		IFluentRouteConfiguration Rules(object rules, bool merge = true);
+		IFluentRouteConfiguration Rules(RouteValueDictionary rules, bool merge = true);
 
-		IFluentRouteConfiguration Namespaces(string[] namespaces);
+		IFluentRouteConfiguration Namespaces(string[] namespaces, bool merge = true);
 
 		IFluentRouteConfiguration Handler(IRouteHandler handler);
 	}
@@ -139,6 +168,8 @@ namespace Clutch.Web.Mvc.Routing
 		{
 			Urls = new Dictionary<string, string>();
 		}
+
+		public string NamePrefix { get; set; }
 
 		public IDictionary<string, string> Urls { get; set; }
 
@@ -152,6 +183,16 @@ namespace Clutch.Web.Mvc.Routing
 
 		#region IFluentRouteConfiguration
 
+		IFluentRouteConfiguration IFluentRouteConfiguration.NamePrefix(string prefix, bool append)
+		{
+			if (NamePrefix == null || !append)
+				NamePrefix = prefix;
+			else if (prefix != null)
+				NamePrefix += "_" + prefix;
+
+			return this;
+		}
+
 		IFluentRouteConfiguration IFluentRouteConfiguration.Url(string culture, string url)
 		{
 			if (culture == null)
@@ -164,53 +205,77 @@ namespace Clutch.Web.Mvc.Routing
 			return this;
 		}
 
-		IFluentRouteConfiguration IFluentRouteConfiguration.Defaults(object defaults)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Defaults(object defaults, bool merge)
 		{
-			Defaults = new RouteValueDictionary(defaults);
+			((IFluentRouteConfiguration)this).Defaults(new RouteValueDictionary(defaults), merge: merge);
 			return this;
 		}
-		IFluentRouteConfiguration IFluentRouteConfiguration.Defaults(RouteValueDictionary defaults)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Defaults(RouteValueDictionary defaults, bool merge)
 		{
-			Defaults = defaults;
+			if (Defaults == null || !merge)
+				Defaults = defaults;
+			else
+				foreach (var pair in defaults)
+					Defaults[pair.Key] = pair.Value;
+
 			return this;
 		}
 
-		IFluentRouteConfiguration IFluentRouteConfiguration.Constraints(object constraints)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Constraints(object constraints, bool merge)
 		{
-			Constraints = new RouteValueDictionary(constraints);
+			((IFluentRouteConfiguration)this).Constraints(new RouteValueDictionary(constraints), merge: merge);
 			return this;
 		}
-		IFluentRouteConfiguration IFluentRouteConfiguration.Constraints(RouteValueDictionary constraints)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Constraints(RouteValueDictionary constraints, bool merge)
 		{
-			Constraints = constraints;
+			if (Constraints == null || !merge)
+				Constraints = constraints;
+			else
+				foreach (var pair in constraints)
+					Constraints[pair.Key] = pair.Value;
+
 			return this;
 		}
 
-		IFluentRouteConfiguration IFluentRouteConfiguration.DataTokens(object dataTokens)
+		IFluentRouteConfiguration IFluentRouteConfiguration.DataTokens(object dataTokens, bool merge)
 		{
-			DataTokens = new RouteValueDictionary(dataTokens);
+			((IFluentRouteConfiguration)this).DataTokens(new RouteValueDictionary(dataTokens), merge: merge);
 			return this;
 		}
-		IFluentRouteConfiguration IFluentRouteConfiguration.DataTokens(RouteValueDictionary dataTokens)
+		IFluentRouteConfiguration IFluentRouteConfiguration.DataTokens(RouteValueDictionary dataTokens, bool merge)
 		{
-			DataTokens = dataTokens;
+			if (DataTokens == null || !merge)
+				DataTokens = dataTokens;
+			else
+				foreach (var pair in dataTokens)
+					DataTokens[pair.Key] = pair.Value;
+
 			return this;
 		}
 
-		IFluentRouteConfiguration IFluentRouteConfiguration.Rules(object rules)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Rules(object rules, bool merge)
 		{
-			Rules = new RouteValueDictionary(rules);
+			((IFluentRouteConfiguration)this).Rules(new RouteValueDictionary(rules), merge: merge);
 			return this;
 		}
-		IFluentRouteConfiguration IFluentRouteConfiguration.Rules(RouteValueDictionary rules)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Rules(RouteValueDictionary rules, bool merge)
 		{
-			Rules = rules;
+			if (Rules == null || !merge)
+				Rules = rules;
+			else
+				foreach (var pair in rules)
+					Rules[pair.Key] = pair.Value;
+
 			return this;
 		}
 
-		IFluentRouteConfiguration IFluentRouteConfiguration.Namespaces(string[] namespaces)
+		IFluentRouteConfiguration IFluentRouteConfiguration.Namespaces(string[] namespaces, bool merge)
 		{
-			Namespaces = namespaces;
+			if (Namespaces == null || !merge)
+				Namespaces = namespaces;
+			else
+				Namespaces = Namespaces.Concat(namespaces).ToArray();
+
 			return this;
 		}
 
