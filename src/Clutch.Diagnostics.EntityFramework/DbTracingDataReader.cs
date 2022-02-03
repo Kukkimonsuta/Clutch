@@ -74,6 +74,9 @@ namespace Clutch.Diagnostics.EntityFramework
 
         public override void Close()
         {
+            if(reader.IsClosed)
+                return;
+
             reader.Close();
             context.OnReaderFinished();
 
